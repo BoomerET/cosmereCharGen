@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function computeLifting(str) {
   if (str === 0) return '100 lbs';
@@ -76,5 +77,17 @@ export default function StatsTab({ char, stats, remainingPoints, onIncrement, on
   );
 }
 
-
-
+StatsTab.propTypes = {
+  char: PropTypes.shape({
+    strength: PropTypes.number.isRequired,
+    speed: PropTypes.number.isRequired,
+    intellect: PropTypes.number.isRequired,
+    willpower: PropTypes.number.isRequired,
+    awareness: PropTypes.number.isRequired,
+    presence: PropTypes.number.isRequired
+  }).isRequired,
+  stats: PropTypes.arrayOf(PropTypes.string).isRequired,
+  remainingPoints: PropTypes.number.isRequired,
+  onIncrement: PropTypes.func.isRequired,
+  onDecrement: PropTypes.func.isRequired
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { EXPERTISE_OPTIONS } from '../../globals/constants';
 
 export default function ExpertiseList({ char, onToggle }) {
@@ -34,3 +35,11 @@ export default function ExpertiseList({ char, onToggle }) {
   );
 }
 
+ExpertiseList.propTypes = {
+  char: PropTypes.shape({
+    intellect: PropTypes.number.isRequired,
+    cultures: PropTypes.arrayOf(PropTypes.string).isRequired,
+    expertise: PropTypes.arrayOf(PropTypes.string).isRequired
+  }).isRequired,
+  onToggle: PropTypes.func.isRequired
+};

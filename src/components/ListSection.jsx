@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function ListSection({ title, items, onAdd, onChangeItem, onRemove }) {
   return (
@@ -20,3 +21,10 @@ export default function ListSection({ title, items, onAdd, onChangeItem, onRemov
   );
 }
 
+ListSection.propTypes = {
+  title: PropTypes.string.isRequired,
+  items: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onAdd: PropTypes.func.isRequired,
+  onChangeItem: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired
+};

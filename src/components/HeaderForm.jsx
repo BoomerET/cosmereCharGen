@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { CULTURE_OPTIONS, STARTING_PATHS } from "../../globals/constants";
 
 export default function HeaderForm({ char, onChange }) {
@@ -100,3 +101,14 @@ export default function HeaderForm({ char, onChange }) {
   );
 }
 
+HeaderForm.propTypes = {
+  char: PropTypes.shape({
+    playerName: PropTypes.string.isRequired,
+    characterName: PropTypes.string.isRequired,
+    ancestry: PropTypes.string.isRequired,
+    cultures: PropTypes.arrayOf(PropTypes.string).isRequired,
+    startingPath: PropTypes.string.isRequired,
+    level: PropTypes.number.isRequired
+  }).isRequired,
+  onChange: PropTypes.func.isRequired
+};

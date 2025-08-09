@@ -1,8 +1,25 @@
+// constants.js
 export const CULTURE_OPTIONS = [
   'Alethi','Azish','Herdazian','Iriali','Kharbranthian',
   'Listeners','Natan','Reshi','Shin','Thaylen','Unkalaki','Veden'
 ];
+
 export const STARTING_PATHS = ['Agent','Envoy','Hunter','Leader','Scholar','Warrior'];
+
+// Centralized attribute list + points
+export const ATTRIBUTES = ['strength','speed','intellect','willpower','awareness','presence'];
+export const MAX_ATTRIBUTE_POINTS = 12;
+
+// Centralized mapping: starting path -> free starting skill
+export const PATH_DEFAULT_SKILL_MAP = {
+  Agent:   'Insight',
+  Envoy:   'Discipline',
+  Hunter:  'Perception',
+  Leader:  'Leadership',
+  Scholar: 'Lore',
+  Warrior: 'Athletics',
+};
+
 export const SKILL_LIST = [
   { name: 'Agility', base: 'speed' },
   { name: 'Athletics', base: 'strength' },
@@ -34,4 +51,3 @@ export const EXPERTISE_OPTIONS = [
   'Listener', 'Military Life', 'Natan', 'Reshi', 'Shin', 'Thaylen',
   'Underworld', 'Unkalaki', 'Veden', 'Wayfarer'
 ];
-

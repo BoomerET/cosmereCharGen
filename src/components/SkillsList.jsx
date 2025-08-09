@@ -1,26 +1,17 @@
 import React, { useEffect } from 'react';
-import { SKILL_LIST } from '../../globals/constants';
+import PropTypes from 'prop-types';
+import { SKILL_LIST, PATH_DEFAULT_SKILL_MAP } from '../../globals/constants';
 
 export default function SkillsList({ char, startingPath, onChangeRank }) {
-  // Map startingPath to its free starting skill
-  const pathDefault = {
-    Agent:    'Insight',
-    Envoy:    'Discipline',
-    Hunter:   'Perception',
-    Leader:   'Leadership',
-    Scholar:  'Lore',
-    Warrior:  'Athletics',
-  };
-  const freeSkill = pathDefault[startingPath];
+  const freeSkill = PATH_DEFAULT_SKILL_MAP[startingPath];
 
-  // Auto-initialize the free skill rank in state
   useEffect(() => {
-    if (char.skills[freeSkill] < 1) {
+    if (freeSkill && char.skills[freeSkill] < 1) {
       onChangeRank(freeSkill, 1, true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [freeSkill]);
 
-  // Calculate extra points spent when level < 2
   const extraSpent = SKILL_LIST.reduce((sum, { name }) => {
     const actual = char.skills[name] || 0;
     const base   = name === freeSkill ? 1 : 0;
@@ -29,7 +20,6 @@ export default function SkillsList({ char, startingPath, onChangeRank }) {
   const maxExtras = 4;
   const remaining = maxExtras - extraSpent;
 
-  // Determine max selectable rank based on level
   const maxRank = char.level >= 2 ? 5 : 2;
 
   return (
@@ -45,10 +35,8 @@ export default function SkillsList({ char, startingPath, onChangeRank }) {
       </div>
 
       {SKILL_LIST.map(({ name, base }) => {
-        const actual = char.skills[name] || 0;
-        // Effective displayed rank includes free base for that one
-        const baseRank = name === freeSkill ? actual : actual;
-        const mod = char[base] + baseRank;
+        const rank = char.skills[name] || 0;
+        const mod = (char[base] || 0) + rank;
 
         return (
           <div key={name} className="flex items-center justify-between mb-2">
@@ -64,14 +52,11 @@ export default function SkillsList({ char, startingPath, onChangeRank }) {
                 <input
                   key={i}
                   type="checkbox"
-                  checked={i <= baseRank}
+                  checked={i <= rank}
                   disabled={
-                    // Never allow unchecking free starter rank 1
                     (i === 1 && name === freeSkill) ||
-                    // Disallow ranks above the level-based max
                     (i > maxRank) ||
-                    // If level < 2, enforce extraPoints limit
-                    (char.level < 2 && i > baseRank && remaining <= 0)
+                    (char.level < 2 && i > rank && remaining <= 0)
                   }
                   onChange={e => onChangeRank(name, i, e.target.checked)}
                   className="w-4 h-4 border rounded"
@@ -85,3 +70,11 @@ export default function SkillsList({ char, startingPath, onChangeRank }) {
   );
 }
 
+SkillsList.propTypes = {
+  char: PropTypes.shape({
+    level: PropTypes.number.isRequired,
+    skills: PropTypes.object.isRequired
+  }).isRequired,
+  startingPath: PropTypes.string.isRequired,
+  onChangeRank: PropTypes.func.isRequired
+};
