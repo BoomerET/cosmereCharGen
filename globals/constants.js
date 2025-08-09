@@ -1,0 +1,37 @@
+export const CULTURE_OPTIONS = [
+  'Alethi','Azish','Herdazian','Iriali','Kharbranthian',
+  'Listeners','Natan','Reshi','Shin','Thaylen','Unkalaki','Veden'
+];
+export const STARTING_PATHS = ['Agent','Envoy','Hunter','Leader','Scholar','Warrior'];
+export const SKILL_LIST = [
+  { name: 'Agility', base: 'speed' },
+  { name: 'Athletics', base: 'strength' },
+  { name: 'Crafting', base: 'intellect' },
+  { name: 'Deception', base: 'presence' },
+  { name: 'Deduction', base: 'intellect' },
+  { name: 'Discipline', base: 'willpower' },
+  { name: 'Heavy Weaponry', base: 'strength' },
+  { name: 'Insight', base: 'awareness' },
+  { name: 'Intimidation', base: 'willpower' },
+  { name: 'Leadership', base: 'presence' },
+  { name: 'Light Weaponry', base: 'speed' },
+  { name: 'Lore', base: 'intellect' },
+  { name: 'Medicine', base: 'intellect' },
+  { name: 'Perception', base: 'awareness' },
+  { name: 'Persuasion', base: 'presence' },
+  { name: 'Stealth', base: 'speed' },
+  { name: 'Survival', base: 'awareness' },
+  { name: 'Thievery', base: 'speed' }
+];
+
+// Expertise options additional to culture expertise
+export const EXPERTISE_OPTIONS = [
+  'Breastplate','Chain Armor','Half Plate','Leather','Shardplate',
+  'Animal Care','Armor Crafting','Culinary Arts','Engineering',
+  'Equipment','History','Literature','Military','Religion',
+  'Riding Horses','Stormwardens','Visual Arts','Weapon Crafting',
+  'Alethi', 'Azish', 'Herdazian', 'High Society', 'Iriali', 'Kharbranthian',
+  'Listener', 'Military Life', 'Natan', 'Reshi', 'Shin', 'Thaylen',
+  'Underworld', 'Unkalaki', 'Veden', 'Wayfarer'
+];
+
