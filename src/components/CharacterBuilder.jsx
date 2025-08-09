@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import HeaderForm from './HeaderForm';
 import StatsTab from './StatsTab';
 import SkillsList from './SkillsList';
@@ -6,88 +6,75 @@ import ListSection from './ListSection';
 import ExpertiseList from './ExpertiseList';
 import { SKILL_LIST } from '../../globals/constants';
 
-//-----------------------------------------------------//
-//                                                     //
-//import { useEffect, useState } from 'react';
-//import { auth } from '../firebase'; // Adjust path as needed
-//import { onAuthStateChanged } from 'firebase/auth';
-
-// Expertise options additional to culture expertise
-const EXPERTISE_OPTIONS = [
-  'Breastplate','Chain Armor','Half Plate','Leather','Shardplate',
-  'Animal Care','Armor Crafting','Culinary Arts','Engineering',
-  'Equipment','History','Literature','Military','Religion',
-  'Riding Horses','Stormwardens','Visual Arts','Weapon Crafting',
-  'Alethi', 'Azish', 'Herdazian', 'High Society', 'Iriali', 'Kharbranthian', 
-  'Listener', 'Military Life', 'Natan', 'Reshi', 'Shin', 'Thaylen', 
-  'Underworld', 'Unkalaki', 'Veden', 'Wayfarer'
-];
-
 export default function CharacterBuilder() {
-  //const [user, setUser] = useState(null);
-
-  //useEffect(() => {
-  //  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-  //    setUser(currentUser);
-  //  });
-  //  return () => unsubscribe();
-  //}, []);
   const [char, setChar] = useState({
-    playerName: '', characterName: '', ancestry: 'Human', cultures: [], startingPath: 'Agent', level: 1,
-    strength:0, speed:0, intellect:0, willpower:0, awareness:0, presence:0,
-    skills: SKILL_LIST.reduce((o,{name})=>({...o,[name]:0}),{}),
-    surges:[], radiancePowers:[], expertise: []
+    playerName: '',
+    characterName: '',
+    ancestry: 'Human',
+    cultures: [],
+    startingPath: 'Agent',
+    level: 1,
+    strength: 0,
+    speed: 0,
+    intellect: 0,
+    willpower: 0,
+    awareness: 0,
+    presence: 0,
+    skills: SKILL_LIST.reduce((o, { name }) => ({ ...o, [name]: 0 }), {}),
+    surges: [],
+    radiancePowers: [],
+    expertise: [],
   });
+
   const [tab, setTab] = useState('stats');
-  const stats = ['strength','speed','intellect','willpower','awareness','presence'];
-  const total = stats.reduce((sum,s)=>sum+char[s],0);
+
+  const stats = ['strength', 'speed', 'intellect', 'willpower', 'awareness', 'presence'];
+  const total = stats.reduce((sum, s) => sum + char[s], 0);
   const remaining = 12 - total;
 
-  const handleHeaderChange = e => {
-    const {name,value,multiple,selectedOptions} = e.target;
+  const handleHeaderChange = (e) => {
+    const { name, value, multiple, selectedOptions } = e.target;
     const val = multiple
-      ? Array.from(selectedOptions).map(o=>o.value).slice(0,2)
+      ? Array.from(selectedOptions).map((o) => o.value).slice(0, 2)
       : value;
-    setChar(prev => ({...prev,[name]:val}));
+    setChar((prev) => ({ ...prev, [name]: val }));
   };
-  const changeStat = (stat,delta) => {
-    setChar(prev => {
-      const newVal = Math.min(3,Math.max(0,prev[stat]+delta));
-      const newTotal = stats.reduce((sum,s)=>sum + (s===stat?newVal:prev[s]),0);
-      return newTotal<=12 ? {...prev,[stat]:newVal} : prev;
-    });
-  };
-  const changeSkillRank = (name,rank,checked) => {
-    setChar(prev => {
-      const cur = prev.skills[name]; let newRank = cur;
-      if(checked && rank === cur+1) newRank = rank;
-      else if(!checked && rank === cur) newRank = cur-1;
-      else return prev;
-      return {...prev, skills:{...prev.skills,[name]:newRank}};
-    });
-  };
-  const addListItem = field => setChar(prev=>({...prev,[field]:[...prev[field],'']}));
-  const updateListItem = (field,i,val) => setChar(prev=>{ const arr=[...prev[field]];arr[i]=val;return{...prev,[field]:arr};});
-  const removeListItem = (field,i) => setChar(prev=>({...prev,[field]:prev[field].filter((_,idx)=>idx!==i)}));
 
-  const changeExpertise = option => {
-    setChar(prev => {
-      const has = prev.expertise.includes(option);
-      let newExp = has
-        ? prev.expertise.filter(e=>e!==option)
-        : prev.expertise.length < prev.intellect
-          ? [...prev.expertise, option]
-          : prev.expertise;
-      return {...prev, expertise: newExp};
+  const changeStat = (stat, delta) => {
+    setChar((prev) => {
+      const newVal = Math.min(3, Math.max(0, prev[stat] + delta));
+      const newTotal = stats.reduce((sum, s) => sum + (s === stat ? newVal : prev[s]), 0);
+      return newTotal <= 12 ? { ...prev, [stat]: newVal } : prev;
     });
   };
+
+  const changeSkillRank = (name, rank, checked) => {
+    setChar((prev) => {
+      const cur = prev.skills[name];
+      let newRank = cur;
+      if (checked && rank === cur + 1) newRank = rank;
+      else if (!checked && rank === cur) newRank = cur - 1;
+      else return prev;
+      return { ...prev, skills: { ...prev.skills, [name]: newRank } };
+    });
+  };
+
+  const addListItem = (field) => setChar((prev) => ({ ...prev, [field]: [...prev[field], ''] }));
+  const updateListItem = (field, i, val) =>
+    setChar((prev) => {
+      const arr = [...prev[field]];
+      arr[i] = val;
+      return { ...prev, [field]: arr };
+    });
+  const removeListItem = (field, i) =>
+    setChar((prev) => ({ ...prev, [field]: prev[field].filter((_, idx) => idx !== i) }));
 
   const TAB_CONFIG = [
     { id: 'stats', label: 'Attributes' },
     { id: 'skills', label: 'Skills' },
     { id: 'surges', label: 'Surges' },
     { id: 'radiant', label: 'Radiant Powers' },
-    { id: 'expertise', label: 'Expertise' }
+    { id: 'expertise', label: 'Expertise' },
   ];
 
   return (
@@ -96,7 +83,7 @@ export default function CharacterBuilder() {
       <HeaderForm char={char} onChange={handleHeaderChange} />
 
       <div className="flex border-b mb-4">
-        {TAB_CONFIG.map(tabItem => (
+        {TAB_CONFIG.map((tabItem) => (
           <button
             key={tabItem.id}
             onClick={() => setTab(tabItem.id)}
@@ -112,8 +99,8 @@ export default function CharacterBuilder() {
           char={char}
           stats={stats}
           remainingPoints={remaining}
-          onIncrement={s => changeStat(s,1)}
-          onDecrement={s => changeStat(s,-1)}
+          onIncrement={(s) => changeStat(s, 1)}
+          onDecrement={(s) => changeStat(s, -1)}
         />
       )}
 
@@ -130,8 +117,8 @@ export default function CharacterBuilder() {
           title="Surges"
           items={char.surges}
           onAdd={() => addListItem('surges')}
-          onChangeItem={(i,v) => updateListItem('surges',i,v)}
-          onRemove={i => removeListItem('surges',i)}
+          onChangeItem={(i, v) => updateListItem('surges', i, v)}
+          onRemove={(i) => removeListItem('surges', i)}
         />
       )}
 
@@ -140,20 +127,19 @@ export default function CharacterBuilder() {
           title="Radiant Powers"
           items={char.radiancePowers}
           onAdd={() => addListItem('radiancePowers')}
-          onChangeItem={(i,v) => updateListItem('radiancePowers',i,v)}
-          onRemove={i => removeListItem('radiancePowers',i)}
+          onChangeItem={(i, v) => updateListItem('radiancePowers', i, v)}
+          onRemove={(i) => removeListItem('radiancePowers', i)}
         />
       )}
-      {tab==='expertise' && (
+
+      {tab === 'expertise' && (
         <ExpertiseList
           char={char}
-          onToggle={opt => {
+          onToggle={(opt) => {
             const has = char.expertise.includes(opt);
-            setChar(prev => ({
+            setChar((prev) => ({
               ...prev,
-              expertise: has
-              ? prev.expertise.filter(x => x !== opt)
-              : [...prev.expertise, opt]
+              expertise: has ? prev.expertise.filter((x) => x !== opt) : [...prev.expertise, opt],
             }));
           }}
         />
@@ -161,4 +147,3 @@ export default function CharacterBuilder() {
     </div>
   );
 }
-
