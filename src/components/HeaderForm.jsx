@@ -58,12 +58,18 @@ export default function HeaderForm({ char, onChange }) {
           name="startingPath"
           value={char.startingPath}
           onChange={onChange}
+          required
+          aria-invalid={char.startingPath === ''}
           className="border rounded p-2 w-full"
         >
+          <option value="" disabled>— Select a Starting Path —</option>
           {STARTING_PATHS.map((path) => (
-            <option key={path}>{path}</option>
+            <option key={path} value={path}>{path}</option>
           ))}
         </select>
+        {char.startingPath === '' && (
+          <p className="mt-1 text-xs text-red-600">Please select a starting path.</p>
+        )}
       </div>
 
       <div>
@@ -79,10 +85,11 @@ export default function HeaderForm({ char, onChange }) {
           className="border rounded p-2 w-full"
         >
           {CULTURE_OPTIONS.map((c) => (
-            <option key={c}>{c}</option>
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
       </div>
+
       <div>
         <label htmlFor="level" className="block text-sm font-medium mb-1">
           Level
@@ -108,7 +115,8 @@ HeaderForm.propTypes = {
     ancestry: PropTypes.string.isRequired,
     cultures: PropTypes.arrayOf(PropTypes.string).isRequired,
     startingPath: PropTypes.string.isRequired,
-    level: PropTypes.number.isRequired
+    level: PropTypes.number.isRequired,
   }).isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
 };
+
