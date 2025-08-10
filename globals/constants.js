@@ -42,12 +42,25 @@ export const SKILL_LIST = [
 ];
 
 // Expertise options additional to culture expertise
-export const EXPERTISE_OPTIONS = [
-  'Breastplate','Chain Armor','Half Plate','Leather','Shardplate',
-  'Animal Care','Armor Crafting','Culinary Arts','Engineering',
-  'Equipment','History','Literature','Military','Religion',
-  'Riding Horses','Stormwardens','Visual Arts','Weapon Crafting',
+export const ARMOR_EXPERTISE_OPTIONS = [
+  'Breastplate','Chain Armor','Half Plate','Leather','Shardplate'
+];
+
+export const CULTURAL_EXPERTISE_OPTIONS = [
   'Alethi', 'Azish', 'Herdazian', 'High Society', 'Iriali', 'Kharbranthian',
   'Listener', 'Military Life', 'Natan', 'Reshi', 'Shin', 'Thaylen',
   'Underworld', 'Unkalaki', 'Veden', 'Wayfarer'
-];
+]
+
+export const UTILILTY_EXPERTISE_OPTIONS = [
+'Animal Care','Armor Crafting','Culinary Arts','Engineering',
+'Equipment','History','Literature','Military','Religion',
+  'Riding Horses','Stormwardens','Visual Arts','Weapon Crafting'
+]
+
+export const WEAPON_EXPERTISE_OPTIONS = [
+  'Axe', 'Crossbow', 'Grandbow', 'Greatsword', 'Half-Shard', 'Hammer',
+  'Javelin', 'Knife', 'Longbow', 'Longspear', 'Longsword', 'Mace',
+  'Poleaxe','Rapier','Shardblade','Shield','Shortbow','Shortspear',
+  'Sidesword', 'Sling', 'Staff', 'Unarmed Attacks', 'Warhammer'
+]
