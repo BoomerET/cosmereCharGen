@@ -5,7 +5,7 @@ import StatsTab from "./StatsTab";
 import SkillsList from "./SkillsList";
 import ListSection from "./ListSection";
 import ExpertiseList from "./ExpertiseList";
-import { SKILL_LIST } from "../../globals/constants";
+import { SKILL_LIST, PATH_PRIMARY_TALENT_MAP } from "../../globals/constants";
 
 export default function CharacterBuilder() {
   const [char, setChar] = useState({
@@ -198,6 +198,9 @@ export default function CharacterBuilder() {
     const senses = sensesString(Number(char.awareness) || 0);
     const recdie = recoveryDie(Number(char.willpower) || 0);
 
+    const primaryTalent = PATH_PRIMARY_TALENT_MAP[char.startingPath] || "";
+    const hasPrimaryTalent = Boolean(primaryTalent);
+
     const carry = carryMax(Number(char.strength) || 0);
     const lift = liftMax(Number(char.strength) || 0);
 
@@ -254,7 +257,7 @@ export default function CharacterBuilder() {
     const ancestryName = char.ancestry || "Human";
 
     const totalsRanks = sumSkillRanks();
-    const totalTalents = 0;
+    const totalTalents = hasPrimaryTalent ? 1 : 0;
     const tier = 1;
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -352,7 +355,21 @@ export default function CharacterBuilder() {
     <skilllist>${skillItems}
     </skilllist>
 
-    <talent />
+    <talent>
+      ${
+        hasPrimaryTalent
+          ? `
+      <id-00001>
+        <name type="string">${escapeXML(primaryTalent)}</name>
+        <type type="string">Primary</type>
+        <text type="formattedtext">
+          <p /> 
+        </text>
+      </id-00001>`
+          : ""
+      }
+    </talent>
+
 
     <tier type="number">${tier}</tier>
     <totalskillranks type="number">${totalsRanks}</totalskillranks>
