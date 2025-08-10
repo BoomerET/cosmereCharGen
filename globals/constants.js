@@ -65,7 +65,7 @@ export const WEAPON_EXPERTISE_OPTIONS = [
   'Sidesword', 'Sling', 'Staff', 'Unarmed Attacks', 'Warhammer'
 ]
 
-export const PATH_PRIMARY_TALENT_MAP = {
+export const PATH_KEY_TALENT_MAP = {
   Agent: 'Opportunist',
   Envoy: 'Rousing Presence',
   Hunter: 'Seek Quarry',

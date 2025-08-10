@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {
   CULTURE_OPTIONS,
   STARTING_PATHS,
-  PATH_PRIMARY_TALENT_MAP,
+  PATH_KEY_TALENT_MAP,
 } from "../../globals/constants";
 
 export default function HeaderForm({ char, onChange }) {
@@ -83,11 +83,11 @@ export default function HeaderForm({ char, onChange }) {
         </select>
         <div>
           <label className="block text-sm font-medium mb-1">
-            Primary Talent
+            Key Talent
           </label>
           <input
             type="text"
-            value={PATH_PRIMARY_TALENT_MAP[char.startingPath] || ""}
+            value={PATH_KEY_TALENT_MAP[char.startingPath] || ""}
             readOnly
             className="border rounded p-2 w-full bg-gray-100"
             placeholder="Select a Starting Path first"
