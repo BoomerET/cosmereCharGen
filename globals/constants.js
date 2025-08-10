@@ -64,3 +64,12 @@ export const WEAPON_EXPERTISE_OPTIONS = [
   'Poleaxe','Rapier','Shardblade','Shield','Shortbow','Shortspear',
   'Sidesword', 'Sling', 'Staff', 'Unarmed Attacks', 'Warhammer'
 ]
+
+export const PATH_PRIMARY_TALENT_MAP = {
+  Agent: 'Opportunist',
+  Envoy: 'Rousing Presence',
+  Hunter: 'Seek Quarry',
+  Leader: 'Decisive Command',
+  Scholar: 'Erudition',
+  Warrior: 'Vigilant Stance',
+};
