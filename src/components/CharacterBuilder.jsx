@@ -101,9 +101,154 @@ export default function CharacterBuilder() {
     return undefined;
   };
 
+  // ----- Export to Fantasy Grounds XML -----
+const escapeXML = (s = '') => String(s)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&apos;');
+
+const computeMovementFeet = (spd) => {
+  if (spd === 0) return 20;
+  if (spd <= 2) return 25;
+  if (spd <= 4) return 30;
+  if (spd <= 6) return 40;
+  if (spd <= 8) return 60;
+  return 80;
+};
+const computeRecoveryDie = (wp) => {
+  if (wp === 0) return 'd4';
+  if (wp <= 2) return 'd6';
+  if (wp <= 4) return 'd8';
+  if (wp <= 6) return 'd10';
+  if (wp <= 8) return 'd12';
+  return 'd20';
+};
+const computeSenses = (aw) => {
+  if (aw === 0) return '5 feet';
+  if (aw <= 2) return '10 feet';
+  if (aw <= 4) return '20 feet';
+  if (aw <= 6) return '50 feet';
+  if (aw <= 8) return '100 feet';
+  return 'Unaffected';
+};
+
+const buildFGXML = () => {
+  const name = char.characterName || 'Unnamed Character';
+  const path = char.startingPath || '';
+
+  const physicalDef   = 10 + char.strength + char.speed;
+  const cognitiveDef  = 10 + char.intellect + char.willpower;
+  const spiritualDef  = 10 + char.awareness + char.presence;
+  const hpTotal       = 10 + char.strength;
+  const focusTotal    = char.willpower + 2;
+  const move          = computeMovementFeet(char.speed);
+  const senses        = computeSenses(char.awareness);
+  const recdie        = computeRecoveryDie(char.willpower);
+
+  // Skills
+  let skillItems = '';
+  let id = 1;
+  for (const { name: skName, base } of SKILL_LIST) {
+    const rank = Number(char.skills[skName] || 0);
+    const total = rank + Number(char[base] || 0);
+    skillItems += `
+        <id-${String(id).padStart(5,'0')}>
+          <bonus type="number">0</bonus>
+          <name type="string">${escapeXML(skName)}</name>
+          <rank type="number">${rank}</rank>
+          <stat type="string">${base}</stat>
+          <total type="number">${total}</total>
+        </id-${String(id).padStart(5,'0')}>`;
+    id++;
+  }
+
+  // Expertise (culture + extras)
+  const normalizeCulture = (c) => (c === 'Listeners' ? 'Listener' : c);
+  const cultureExpertise = (char.cultures || []).map(normalizeCulture);
+  const extraExpertise   = char.expertise || [];
+  const allExpertise     = [...new Set([...cultureExpertise, ...extraExpertise])];
+
+  let expertiseItems = '';
+  id = 1;
+  for (const label of allExpertise) {
+    expertiseItems += `
+        <id-${String(id).padStart(5,'0')}>
+          <name type="string">${escapeXML(label)}</name>
+        </id-${String(id).padStart(5,'0')}>`;
+    id++;
+  }
+
+  const xml = `<?xml version="1.0" encoding="utf-8"?>
+<root version="4.8" dataversion="${new Date().toISOString().slice(0,10).replace(/-/g,'')}" release="8.1|CoreRPG:7">
+  <character>
+    <name type="string">${escapeXML(name)}</name>
+    <path type="string">${escapeXML(path)}</path>
+    <level type="number">${Number(char.level) || 1}</level>
+    <ancestry>
+      <name type="string">${escapeXML(char.ancestry)}${char.cultures?.length ? ` (${escapeXML(char.cultures[0])})` : ''}</name>
+    </ancestry>
+    <attributes>
+      <awareness><score type="number">${Number(char.awareness)||0}</score></awareness>
+      <intellect><score type="number">${Number(char.intellect)||0}</score></intellect>
+      <presence><score type="number">${Number(char.presence)||0}</score></presence>
+      <speed><score type="number">${Number(char.speed)||0}</score></speed>
+      <strength><score type="number">${Number(char.strength)||0}</score></strength>
+      <willpower><score type="number">${Number(char.willpower)||0}</score></willpower>
+    </attributes>
+    <defenses>
+      <cognitivedefense><score type="number">${cognitiveDef}</score></cognitivedefense>
+      <physicaldefense><score type="number">${physicalDef}</score></physicaldefense>
+      <spiritualdefense><score type="number">${spiritualDef}</score></spiritualdefense>
+    </defenses>
+    <hp><total type="number">${hpTotal}</total></hp>
+    <focus><total type="number">${focusTotal}</total></focus>
+    <investiture><total type="number">0</total><current type="number">0</current><enabled type="number">0</enabled></investiture>
+    <movement type="number">${move}</movement>
+    <senses type="string">${escapeXML(senses)}</senses>
+    <recdie type="dice">${recdie}</recdie>
+    <skilllist>${skillItems}
+    </skilllist>
+    <expertise>${expertiseItems}
+    </expertise>
+  </character>
+</root>`;
+  return xml;
+};
+
+const downloadXML = () => {
+  const xml = buildFGXML();
+  const blob = new Blob([xml], { type: 'application/xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(char.characterName || 'character').replace(/[^a-z0-9-_]/gi,'_')}.xml`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">Cosmere RPG Character Creator</h1>
+      {/* <h1 className="text-3xl font-bold mb-4">Cosmere RPG Character Creator</h1> */}
+      <div className="flex items-center justify-between mb-4">
+  <h1 className="text-3xl font-bold">Cosmere RPG Character Creator</h1>
+  <button
+    type="button"
+    onClick={downloadXML}
+    disabled={!hasPath || !attrsDone}
+    title={!hasPath
+      ? 'Select a starting path first'
+      : (!attrsDone ? 'Distribute all attribute points first' : 'Export Fantasy Grounds XML')}
+    className={`px-3 py-2 rounded border ${(!hasPath || !attrsDone) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'}`}
+  >
+    Export FG XML
+  </button>
+</div>
+
       <HeaderForm char={char} onChange={handleHeaderChange} requirePathSelection />
 
       <div className="flex gap-2 border-b mb-2" role="tablist" aria-label="Character builder tabs">
