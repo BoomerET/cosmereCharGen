@@ -1,21 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { EXPERTISE_OPTIONS } from '../../globals/constants';
+import {
+  ARMOR_EXPERTISE_OPTIONS,
+  CULTURAL_EXPERTISE_OPTIONS,
+  UTILILTY_EXPERTISE_OPTIONS,
+  WEAPON_EXPERTISE_OPTIONS,
+} from '../../globals/constants';
+
+// Normalize culture "Listeners" -> expertise label "Listener"
+const normalizeCultureToExpertise = (c) => (c === 'Listeners' ? 'Listener' : c);
 
 export default function ExpertiseList({ char, onToggle }) {
-  // Map cultures to matching expertise labels (e.g., "Listeners" -> "Listener")
-  const normalizeCultureToExpertise = (c) => (c === 'Listeners' ? 'Listener' : c);
-
-  // Determine which options are locked by culture expertise
-  const lockedOptions = new Set(
+  // Locked by culture: exactly the cultures selected (normalized),
+  // but only if that normalized value exists in the CULTURAL_EXPERTISE_OPTIONS list.
+  const lockedSet = new Set(
     (char.cultures || [])
       .map(normalizeCultureToExpertise)
-      .filter((c) => EXPERTISE_OPTIONS.includes(c))
+      .filter((c) => CULTURAL_EXPERTISE_OPTIONS.includes(c))
   );
 
-  // Player-chosen (non-culture) expertise count and cap
-  const selectedExtrasCount = (char.expertise || []).length;
+  // Player-chosen extras and cap
+  const selectedExtras = new Set(char.expertise || []);
+  const selectedExtrasCount = selectedExtras.size;
   const maxExtras = Math.max(0, Number(char.intellect) || 0);
+  const atCap = selectedExtrasCount >= maxExtras;
+
+  const renderGroup = (title, options, markCultureLocked = false) => (
+    <div key={title} className="mb-5">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <div className="grid grid-cols-2 gap-2">
+        {options.map((opt) => {
+          const isLocked = markCultureLocked && lockedSet.has(opt);
+          const isSelected = isLocked || selectedExtras.has(opt);
+          const isDisabled = isLocked || (!isSelected && atCap);
+
+          return (
+            <label key={opt} className={`flex items-center space-x-2 ${isDisabled ? 'opacity-60' : ''}`}>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={isDisabled}
+                onChange={() => {
+                  if (isDisabled && !isSelected) return; // block at cap
+                  if (!isLocked) onToggle(opt);
+                }}
+                className="w-4 h-4 border rounded"
+              />
+              <span>
+                {opt}
+                {isLocked ? ' (Culture)' : ''}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   return (
     <div className="mb-6">
@@ -25,34 +65,10 @@ export default function ExpertiseList({ char, onToggle }) {
       </p>
       <p className="mb-3 text-sm text-gray-600">{selectedExtrasCount} / {maxExtras} chosen</p>
 
-      <div className="grid grid-cols-2 gap-2">
-        {EXPERTISE_OPTIONS.map((option) => {
-          const isLocked = lockedOptions.has(option);
-          const isExtraSelected = (char.expertise || []).includes(option);
-          const isSelected = isLocked || isExtraSelected;
-
-          // Disable if: locked by culture OR selection cap reached and this option isn't already selected
-          const atCap = selectedExtrasCount >= maxExtras;
-          const isDisabled = isLocked || (!isSelected && atCap);
-
-          return (
-            <label key={option} className={`flex items-center space-x-2 ${isDisabled ? 'opacity-60' : ''}`}>
-              <input
-                type="checkbox"
-                checked={isSelected}
-                disabled={isDisabled}
-                onChange={() => {
-                  if (isDisabled && !isSelected) return; // block new selection at cap
-                  // Toggling only affects extra picks, never culture-locked picks
-                  if (!isLocked) onToggle(option);
-                }}
-                className="w-4 h-4 border rounded"
-              />
-              <span>{option}{isLocked ? ' (Culture)' : ''}</span>
-            </label>
-          );
-        })}
-      </div>
+      {renderGroup('Armor Expertise', ARMOR_EXPERTISE_OPTIONS)}
+      {renderGroup('Cultural Expertise', CULTURAL_EXPERTISE_OPTIONS, true)}
+      {renderGroup('Utility Expertise', UTILILTY_EXPERTISE_OPTIONS)}
+      {renderGroup('Weapon Expertise', WEAPON_EXPERTISE_OPTIONS)}
     </div>
   );
 }
@@ -65,4 +81,3 @@ ExpertiseList.propTypes = {
   }).isRequired,
   onToggle: PropTypes.func.isRequired,
 };
-
