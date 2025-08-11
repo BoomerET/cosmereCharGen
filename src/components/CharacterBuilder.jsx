@@ -55,15 +55,68 @@ export default function CharacterBuilder() {
     if (!isTabAccessible(tab)) setTab("stats");
   }, [tab, hasPath, attrsDone, hasTwoCultures]);
 
-  const handleHeaderChange = (e) => {
-    const { name, value, multiple, selectedOptions } = e.target;
+// Accepts either a DOM-like event ({ target: { name, value } }) or a plain object payload
+const handleHeaderChange = (arg) => {
+  // 1) DOM event path (keeps your existing multiple-select logic)
+  if (arg && arg.target) {
+    const { name, value, multiple, selectedOptions } = arg.target;
     const val = multiple
-      ? Array.from(selectedOptions)
-          .map((o) => o.value)
-          .slice(0, 2)
+      ? Array.from(selectedOptions).map((o) => o.value).slice(0, 2)
       : value;
     setChar((prev) => ({ ...prev, [name]: val }));
-  };
+    return;
+  }
+
+  // 2) Plain object path (normalize and merge into your current char shape)
+  if (arg && typeof arg === "object") {
+    setChar((prev) => {
+      const next = { ...prev };
+
+      // Path / level
+      if (arg.startingPath != null) next.startingPath = arg.startingPath;
+      if (arg.path != null) next.startingPath = arg.path; // tolerate "path" from HeaderForm
+      if (arg.level != null) next.level = Number(arg.level) || 1;
+
+      // Names
+      if (arg.characterName != null) next.characterName = arg.characterName;
+      if (arg.name != null) next.characterName = arg.name; // tolerate "name" from HeaderForm
+
+      // Ancestry & cultures (if provided)
+      if (typeof arg.ancestry === "string") next.ancestry = arg.ancestry;
+      if (Array.isArray(arg.cultures)) next.cultures = arg.cultures.slice(0, 2);
+
+      // Attributes: accept either flat (lowercase) or nested (capitalized) keys
+      const clamp = (n) => Math.max(0, Math.min(3, Number(n) || 0));
+      const applyAttr = (k, v) => (v == null ? undefined : (next[k] = clamp(v)));
+
+      applyAttr("strength", arg.strength);
+      applyAttr("speed", arg.speed);
+      applyAttr("intellect", arg.intellect);
+      applyAttr("willpower", arg.willpower);
+      applyAttr("awareness", arg.awareness);
+      applyAttr("presence", arg.presence);
+
+      if (arg.attributes && typeof arg.attributes === "object") {
+        const map = {
+          Strength: "strength",
+          Speed: "speed",
+          Intellect: "intellect",
+          Willpower: "willpower",
+          Awareness: "awareness",
+          Presence: "presence",
+        };
+        for (const [k, v] of Object.entries(arg.attributes)) {
+          if (map[k]) applyAttr(map[k], v);
+        }
+      }
+
+      return next;
+    });
+    return;
+  }
+
+  console.warn("Unexpected onChange payload from HeaderForm:", arg);
+};
 
   const changeStat = (stat, delta) => {
     setChar((prev) => {

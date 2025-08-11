@@ -1,152 +1,197 @@
-import React from "react";
-import PropTypes from "prop-types";
-import {
-  CULTURE_OPTIONS,
-  STARTING_PATHS,
-  PATH_KEY_TALENT_MAP,
-} from "../../globals/constants";
+import React, { useEffect, useMemo, useState } from "react";
 
-export default function HeaderForm({ char, onChange }) {
+/**
+ * HeaderForm.jsx
+ *
+ * - Highlights Awareness, Intellect, and Speed when Chosen Path is "Agent"
+ * - Auto-populates Key Talent from Chosen Path
+ * - Exposes derived `totalTalents` (1 if Key Talent exists, else 0) via onChange
+ *
+ * Props (optional):
+ *  - initialValues: {
+ *      name, level, path, keyTalent,
+ *      attributes: { Strength, Speed, Intellect, Willpower, Awareness, Presence }
+ *    }
+ *  - onChange(formState) -> void  (called whenever form state changes)
+ */
+
+const PATH_TO_KEY_TALENT = {
+  Agent: "Opportunist",
+  Envoy: "Rousing Presence",
+  Hunter: "Seek Quarry",
+  Leader: "Decisive Command",
+  Scholar: "Erudition",
+  Warrior: "Vigilant Stance",
+};
+
+const DEFAULT_ATTRIBUTES = {
+  Strength: 0,
+  Speed: 0,
+  Intellect: 0,
+  Willpower: 0,
+  Awareness: 0,
+  Presence: 0,
+};
+
+export default function HeaderForm({
+  initialValues,
+  onChange,
+}) {
+  const [form, setForm] = useState(() => ({
+    name: initialValues?.name ?? "",
+    level: Number.isFinite(Number(initialValues?.level))
+      ? Number(initialValues.level)
+      : 1,
+    path: initialValues?.path ?? "",
+    keyTalent: initialValues?.keyTalent ?? "",
+    attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
+  }));
+
+  const isAgent = form.path === "Agent";
+  const agentHighlights = useMemo(
+    () => new Set(["Awareness", "Intellect", "Speed"]),
+    []
+  );
+
+  // Keep Key Talent in sync with Chosen Path
+  useEffect(() => {
+    const mapped = PATH_TO_KEY_TALENT[form.path] || "";
+    if (mapped !== form.keyTalent) {
+      setForm((prev) => ({ ...prev, keyTalent: mapped }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.path]);
+
+  // Derived: totalTalents (for FG XML export elsewhere)
+  const totalTalents = form.keyTalent ? 1 : 0;
+
+  // Bubble state upward whenever it changes
+  useEffect(() => {
+    if (typeof onChange === "function") {
+      onChange?.({ ...form, totalTalents });
+    }
+  }, [form, totalTalents, onChange]);
+
+  const updateField = (field, value) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
+
+  const updateAttr = (attr, value) =>
+    setForm((prev) => ({
+      ...prev,
+      attributes: { ...prev.attributes, [attr]: Number(value) || 0 },
+    }));
+
+  const attributeInput = (attrName) => {
+    const highlight = isAgent && agentHighlights.has(attrName);
+    return (
+      <label
+        key={attrName}
+        className={`flex items-center justify-between gap-3 rounded-xl border p-3
+        ${highlight ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50" : "border-gray-300"}
+      `}
+      >
+        <span className="text-sm font-medium">{attrName}</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          className="w-24 rounded-md border border-gray-300 p-2 text-right"
+          value={form.attributes[attrName]}
+          onChange={(e) => updateAttr(attrName, e.target.value)}
+        />
+      </label>
+    );
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-4 mb-6">
-      <div>
-        <label htmlFor="playerName" className="block text-sm font-medium mb-1">
-          Player Name
-        </label>
-        <input
-          id="playerName"
-          name="playerName"
-          placeholder="Player Name"
-          value={char.playerName}
-          onChange={onChange}
-          className="border rounded p-2 w-full"
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="characterName"
-          className="block text-sm font-medium mb-1"
-        >
-          Character Name
-        </label>
-        <input
-          id="characterName"
-          name="characterName"
-          placeholder="Character Name"
-          value={char.characterName}
-          onChange={onChange}
-          className="border rounded p-2 w-full"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="ancestry" className="block text-sm font-medium mb-1">
-          Ancestry
-        </label>
-        <select
-          id="ancestry"
-          name="ancestry"
-          value={char.ancestry}
-          onChange={onChange}
-          className="border rounded p-2 w-full"
-        >
-          <option>Human</option>
-          <option>Singer</option>
-        </select>
-      </div>
-
-      <div>
-        <label
-          htmlFor="startingPath"
-          className="block text-sm font-medium mb-1"
-        >
-          Starting Path
-        </label>
-        <select
-          id="startingPath"
-          name="startingPath"
-          value={char.startingPath}
-          onChange={onChange}
-          required
-          aria-invalid={char.startingPath === ""}
-          className="border rounded p-2 w-full"
-        >
-          <option value="" disabled>
-            — Select a Starting Path —
-          </option>
-          {STARTING_PATHS.map((path) => (
-            <option key={path} value={path}>
-              {path}
-            </option>
-          ))}
-        </select>
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Key Talent
-          </label>
+    <div className="space-y-6">
+      {/* Basic Info */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Character Name</span>
           <input
             type="text"
-            value={PATH_KEY_TALENT_MAP[char.startingPath] || ""}
-            readOnly
-            className="border rounded p-2 w-full bg-gray-100"
-            placeholder="Select a Starting Path first"
+            className="rounded-md border border-gray-300 p-2"
+            value={form.name}
+            onChange={(e) => updateField("name", e.target.value)}
+            placeholder="e.g., Kael Thorn"
           />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Level</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            className="rounded-md border border-gray-300 p-2"
+            value={form.level}
+            onChange={(e) => updateField("level", Number(e.target.value) || 1)}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1">
+          <span className="text-sm font-medium">Chosen Path</span>
+          <select
+            className="rounded-md border border-gray-300 p-2"
+            value={form.path}
+            onChange={(e) => updateField("path", e.target.value)}
+          >
+            <option value="">Select a path…</option>
+            <option value="Agent">Agent</option>
+            <option value="Envoy">Envoy</option>
+            <option value="Hunter">Hunter</option>
+            <option value="Leader">Leader</option>
+            <option value="Scholar">Scholar</option>
+            <option value="Warrior">Warrior</option>
+          </select>
+        </label>
+      </div>
+
+      {/* Key Talent (auto) */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <label className="flex flex-col gap-1 md:col-span-1">
+          <span className="text-sm font-medium">Key Talent</span>
+          <input
+            type="text"
+            className="rounded-md border border-gray-300 p-2 bg-gray-50"
+            value={form.keyTalent}
+            onChange={(e) => updateField("keyTalent", e.target.value)}
+            placeholder="Auto-set from Chosen Path"
+          />
+          <span className="text-xs text-gray-500">
+            Auto-filled based on Chosen Path (editable if needed).
+          </span>
+        </label>
+
+        {/* Derived field (hidden in UI but available to parent via onChange) */}
+        <div className="hidden">
+          <input type="number" value={totalTalents} readOnly />
         </div>
-
-        {char.startingPath === "" && (
-          <p className="mt-1 text-xs text-red-600">
-            Please select a starting path.
-          </p>
-        )}
       </div>
 
-      <div>
-        <label htmlFor="cultures" className="block text-sm font-medium mb-1">
-          Cultural Expertise (Pick 2)
-        </label>
-        <select
-          id="cultures"
-          name="cultures"
-          multiple
-          value={char.cultures}
-          onChange={onChange}
-          className="border rounded p-2 w-full"
-        >
-          {CULTURE_OPTIONS.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="level" className="block text-sm font-medium mb-1">
-          Level
-        </label>
-        <input
-          id="level"
-          name="level"
-          type="number"
-          min="1"
-          value={char.level}
-          onChange={onChange}
-          className="border rounded p-2 w-full"
-        />
-      </div>
+      {/* Attributes */}
+      <section>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-base font-semibold">Attributes</h3>
+          {isAgent && (
+            <span className="text-xs font-medium text-amber-700">
+              Agent path selected — Awareness, Intellect, and Speed highlighted
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            "Awareness",
+            "Intellect",
+            "Speed",
+            "Strength",
+            "Willpower",
+            "Presence",
+          ].map(attributeInput)}
+        </div>
+      </section>
     </div>
   );
 }
 
-HeaderForm.propTypes = {
-  char: PropTypes.shape({
-    playerName: PropTypes.string.isRequired,
-    characterName: PropTypes.string.isRequired,
-    ancestry: PropTypes.string.isRequired,
-    cultures: PropTypes.arrayOf(PropTypes.string).isRequired,
-    startingPath: PropTypes.string.isRequired,
-    level: PropTypes.number.isRequired,
-  }).isRequired,
-  onChange: PropTypes.func.isRequired,
-};
