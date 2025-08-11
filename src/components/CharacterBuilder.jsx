@@ -585,7 +585,7 @@ export default function CharacterBuilder() {
         );
       }}
     >
-      {CULTURE_OPTIONS.map((opt) => (
+      {CULTURAL_EXPERTISE_OPTIONS.map((opt) => (
         <option key={opt} value={opt}>
           {opt}
         </option>
