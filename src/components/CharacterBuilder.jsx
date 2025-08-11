@@ -5,7 +5,7 @@ import StatsTab from "./StatsTab";
 import SkillsList from "./SkillsList";
 import ListSection from "./ListSection";
 import ExpertiseList from "./ExpertiseList";
-import { SKILL_LIST, PATH_KEY_TALENT_MAP } from "../../globals/constants";
+import { SKILL_LIST, PATH_KEY_TALENT_MAP, CULTURAL_EXPERTISE_OPTIONS } from "../../globals/constants";
 
 export default function CharacterBuilder() {
   const [char, setChar] = useState({
