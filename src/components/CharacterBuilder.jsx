@@ -55,68 +55,130 @@ export default function CharacterBuilder() {
     if (!isTabAccessible(tab)) setTab("stats");
   }, [tab, hasPath, attrsDone, hasTwoCultures]);
 
-// Accepts either a DOM-like event ({ target: { name, value } }) or a plain object payload
-const handleHeaderChange = (arg) => {
-  // 1) DOM event path (keeps your existing multiple-select logic)
-  if (arg && arg.target) {
-    const { name, value, multiple, selectedOptions } = arg.target;
-    const val = multiple
-      ? Array.from(selectedOptions).map((o) => o.value).slice(0, 2)
-      : value;
-    setChar((prev) => ({ ...prev, [name]: val }));
-    return;
-  }
+  // Accepts either a DOM-like event or a plain object from HeaderForm
+  const handleHeaderChange = (arg) => {
+    // Local helper that merges a form payload *only when values actually change*
+    const mergeFromPayload = (payload) => {
+      if (!payload || typeof payload !== "object") return;
 
-  // 2) Plain object path (normalize and merge into your current char shape)
-  if (arg && typeof arg === "object") {
-    setChar((prev) => {
-      const next = { ...prev };
+      setChar((prev) => {
+        let changed = false;
+        const next = { ...prev };
 
-      // Path / level
-      if (arg.startingPath != null) next.startingPath = arg.startingPath;
-      if (arg.path != null) next.startingPath = arg.path; // tolerate "path" from HeaderForm
-      if (arg.level != null) next.level = Number(arg.level) || 1;
-
-      // Names
-      if (arg.characterName != null) next.characterName = arg.characterName;
-      if (arg.name != null) next.characterName = arg.name; // tolerate "name" from HeaderForm
-
-      // Ancestry & cultures (if provided)
-      if (typeof arg.ancestry === "string") next.ancestry = arg.ancestry;
-      if (Array.isArray(arg.cultures)) next.cultures = arg.cultures.slice(0, 2);
-
-      // Attributes: accept either flat (lowercase) or nested (capitalized) keys
-      const clamp = (n) => Math.max(0, Math.min(3, Number(n) || 0));
-      const applyAttr = (k, v) => (v == null ? undefined : (next[k] = clamp(v)));
-
-      applyAttr("strength", arg.strength);
-      applyAttr("speed", arg.speed);
-      applyAttr("intellect", arg.intellect);
-      applyAttr("willpower", arg.willpower);
-      applyAttr("awareness", arg.awareness);
-      applyAttr("presence", arg.presence);
-
-      if (arg.attributes && typeof arg.attributes === "object") {
-        const map = {
-          Strength: "strength",
-          Speed: "speed",
-          Intellect: "intellect",
-          Willpower: "willpower",
-          Awareness: "awareness",
-          Presence: "presence",
-        };
-        for (const [k, v] of Object.entries(arg.attributes)) {
-          if (map[k]) applyAttr(map[k], v);
+        // Names / level
+        if (payload.name != null && payload.name !== prev.characterName) {
+          next.characterName = payload.name;
+          changed = true;
         }
+        if (payload.characterName != null && payload.characterName !== prev.characterName) {
+          next.characterName = payload.characterName;
+          changed = true;
+        }
+        if (payload.level != null) {
+          const lvl = Number(payload.level) || 1;
+          if (lvl !== prev.level) {
+            next.level = lvl;
+            changed = true;
+          }
+        }
+
+        // Path normalization
+        const newPath = payload.startingPath ?? payload.path;
+        if (newPath != null && newPath !== prev.startingPath) {
+          next.startingPath = newPath;
+          changed = true;
+        }
+
+        // Ancestry & cultures
+        if (typeof payload.ancestry === "string" && payload.ancestry !== prev.ancestry) {
+          next.ancestry = payload.ancestry;
+          changed = true;
+        }
+        if (Array.isArray(payload.cultures)) {
+          const nextCult = payload.cultures.slice(0, 2);
+          if (JSON.stringify(nextCult) !== JSON.stringify(prev.cultures)) {
+            next.cultures = nextCult;
+            changed = true;
+          }
+        }
+
+        // Attributes (flat or nested)
+        const clamp = (n) => Math.max(0, Math.min(3, Number(n) || 0));
+        const setAttr = (key, raw) => {
+          if (raw == null) return;
+          const v = clamp(raw);
+          if (v !== prev[key]) {
+            next[key] = v;
+            changed = true;
+          }
+        };
+
+        setAttr("strength", payload.strength);
+        setAttr("speed", payload.speed);
+        setAttr("intellect", payload.intellect);
+        setAttr("willpower", payload.willpower);
+        setAttr("awareness", payload.awareness);
+        setAttr("presence", payload.presence);
+
+        if (payload.attributes && typeof payload.attributes === "object") {
+          const map = {
+            Strength: "strength",
+            Speed: "speed",
+            Intellect: "intellect",
+            Willpower: "willpower",
+            Awareness: "awareness",
+            Presence: "presence",
+          };
+          for (const [k, v] of Object.entries(payload.attributes)) {
+            if (map[k]) setAttr(map[k], v);
+          }
+        }
+
+        // Clean up any accidental field from earlier handlers
+        if ("headerForm" in next) {
+          delete next.headerForm;
+          changed = true;
+        }
+
+        return changed ? next : prev; // no-op if nothing changed
+      });
+    };
+
+    // 1) DOM-like event path
+    if (arg && arg.target) {
+      const { name, value, multiple, selectedOptions } = arg.target;
+
+      // Our HeaderForm sends a synthetic event named "headerForm" → treat as object payload
+      if (name === "headerForm") {
+        mergeFromPayload(value);
+        return;
       }
 
-      return next;
-    });
-    return;
-  }
+      // Otherwise, this is a normal input/select from some other part of the UI
+      const val = multiple
+        ? Array.from(selectedOptions).map((o) => o.value).slice(0, 2)
+        : value;
 
-  console.warn("Unexpected onChange payload from HeaderForm:", arg);
-};
+      setChar((prev) => {
+        const key = name === "path" ? "startingPath" : name; // normalize
+        const nextVal = key === "level" ? (Number(val) || 1) : val;
+        if (prev[key] === nextVal) return prev; // no-op
+        const next = { ...prev, [key]: nextVal };
+        if ("headerForm" in next) delete next.headerForm; // keep state clean
+        return next;
+      });
+      return;
+    }
+
+    // 2) Plain object payload path
+    const payload = arg && arg.target ? arg.target.value : arg;
+    if (!payload || typeof payload !== "object") {
+      console.warn("Unexpected onChange payload from HeaderForm:", arg);
+      return;
+    }
+    mergeFromPayload(payload);
+  };
+
 
   const changeStat = (stat, delta) => {
     setChar((prev) => {
@@ -315,9 +377,9 @@ const handleHeaderChange = (arg) => {
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
 <root version="4.8" dataversion="${new Date()
-      .toISOString()
-      .slice(0, 10)
-      .replace(/-/g, "")}" release="8.1|CoreRPG:7">
+        .toISOString()
+        .slice(0, 10)
+        .replace(/-/g, "")}" release="8.1|CoreRPG:7">
   <character>
     <ancestry>
       <name type="string">${escapeXML(ancestryName)}</name>
@@ -331,23 +393,17 @@ const handleHeaderChange = (arg) => {
     </ancestry>
 
     <attributes>
-      <awareness><score type="number">${
-        Number(char.awareness) || 0
+      <awareness><score type="number">${Number(char.awareness) || 0
       }</score></awareness>
-      <intellect><score type="number">${
-        Number(char.intellect) || 0
+      <intellect><score type="number">${Number(char.intellect) || 0
       }</score></intellect>
-      <presence><score type="number">${
-        Number(char.presence) || 0
+      <presence><score type="number">${Number(char.presence) || 0
       }</score></presence>
-      <speed><bonus type="number">0</bonus><score type="number">${
-        Number(char.speed) || 0
+      <speed><bonus type="number">0</bonus><score type="number">${Number(char.speed) || 0
       }</score></speed>
-      <strength><score type="number">${
-        Number(char.strength) || 0
+      <strength><score type="number">${Number(char.strength) || 0
       }</score></strength>
-      <willpower><score type="number">${
-        Number(char.willpower) || 0
+      <willpower><score type="number">${Number(char.willpower) || 0
       }</score></willpower>
     </attributes>
 
@@ -409,9 +465,8 @@ const handleHeaderChange = (arg) => {
     </skilllist>
 
     <talent>
-      ${
-        hasKeyTalent
-          ? `
+      ${hasKeyTalent
+        ? `
       <id-00001>
         <name type="string">${escapeXML(keyTalent)}</name>
         <type type="string">Key</type>
@@ -419,7 +474,7 @@ const handleHeaderChange = (arg) => {
           <p /> 
         </text>
       </id-00001>`
-          : ""
+        : ""
       }
     </talent>
 
@@ -488,14 +543,13 @@ const handleHeaderChange = (arg) => {
             !hasPath
               ? "Select a starting path first"
               : !attrsDone
-              ? "Distribute all attribute points first"
-              : "Export Fantasy Grounds XML"
+                ? "Distribute all attribute points first"
+                : "Export Fantasy Grounds XML"
           }
-          className={`px-3 py-2 rounded border ${
-            !hasPath || !attrsDone
+          className={`px-3 py-2 rounded border ${!hasPath || !attrsDone
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-blue-50"
-          }`}
+            }`}
         >
           Export FG XML
         </button>
@@ -527,13 +581,11 @@ const handleHeaderChange = (arg) => {
                 if (disabled) return;
                 setTab(tabItem.id);
               }}
-              className={`px-4 py-2 -mb-[2px] border-b-2 transition-colors ${
-                disabled ? "opacity-50 cursor-not-allowed" : ""
-              }
-                ${
-                  tab === tabItem.id
-                    ? "border-blue-500 text-blue-800 font-semibold"
-                    : "border-transparent text-gray-600 hover:text-blue-700"
+              className={`px-4 py-2 -mb-[2px] border-b-2 transition-colors ${disabled ? "opacity-50 cursor-not-allowed" : ""
+                }
+                ${tab === tabItem.id
+                  ? "border-blue-500 text-blue-800 font-semibold"
+                  : "border-transparent text-gray-600 hover:text-blue-700"
                 }`}
               title={tooltipFor(tabItem.id)}
             >
