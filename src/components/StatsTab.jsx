@@ -56,6 +56,7 @@ export default function StatsTab({
 }) {
   return (
     <div className="flex space-x-8 mb-6">
+      {/*
       <div className="flex-1">
         <h2 className="text-xl font-semibold mb-2">Attributes</h2>
         {stats.map((stat) => (
@@ -80,6 +81,7 @@ export default function StatsTab({
         ))}
         <p className="mt-2 font-medium">Remaining Points: {remainingPoints}</p>
       </div>
+      */}
 
       <div className="flex-1">
         <h2 className="text-xl font-semibold mb-2">Derived Stats</h2>
