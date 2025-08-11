@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
+
 
 /**
  * HeaderForm.jsx
