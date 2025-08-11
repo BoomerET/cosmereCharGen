@@ -46,43 +46,9 @@ function computeSensesRange(aw) {
   return 'Unaffected';
 }
 
-export default function StatsTab({
-  char,
-  stats,
-  remainingPoints,
-  onIncrement,
-  onDecrement,
-  showHealth
-}) {
+export default function StatsTab({ char, showHealth }) {
   return (
     <div className="flex space-x-8 mb-6">
-      {/*
-      <div className="flex-1">
-        <h2 className="text-xl font-semibold mb-2">Attributes</h2>
-        {stats.map((stat) => (
-          <div key={stat} className="flex items-center mb-2">
-            <span className="w-32 capitalize font-medium">{stat}</span>
-            <button
-              onClick={() => onDecrement(stat)}
-              disabled={char[stat] === 0}
-              className="px-2 border rounded"
-            >
-              -
-            </button>
-            <span className="mx-2 w-6 text-center">{char[stat]}</span>
-            <button
-              onClick={() => onIncrement(stat)}
-              disabled={char[stat] === 3 || remainingPoints === 0}
-              className="px-2 border rounded"
-            >
-              +
-            </button>
-          </div>
-        ))}
-        <p className="mt-2 font-medium">Remaining Points: {remainingPoints}</p>
-      </div>
-      */}
-
       <div className="flex-1">
         <h2 className="text-xl font-semibold mb-2">Derived Stats</h2>
         <p><strong>Lifting:</strong> {computeLifting(char.strength)}</p>
@@ -116,10 +82,5 @@ StatsTab.propTypes = {
     awareness: PropTypes.number.isRequired,
     presence: PropTypes.number.isRequired
   }).isRequired,
-  stats: PropTypes.arrayOf(PropTypes.string).isRequired,
-  remainingPoints: PropTypes.number.isRequired,
-  onIncrement: PropTypes.func.isRequired,
-  onDecrement: PropTypes.func.isRequired,
   showHealth: PropTypes.bool
 };
-
