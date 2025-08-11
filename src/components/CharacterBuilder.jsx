@@ -561,7 +561,7 @@ export default function CharacterBuilder() {
         requirePathSelection
       />
 
-      {hasPath && attrsDone && (
+      {hasPath && (
   <div className="mb-4">
     <label htmlFor="cultural-expertise" className="block text-sm font-medium mb-1">
       Cultural Expertise <span className="text-gray-500">(pick exactly 2)</span>
