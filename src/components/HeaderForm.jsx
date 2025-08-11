@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
+//import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
 
 
 /**
@@ -35,6 +35,8 @@ const DEFAULT_ATTRIBUTES = {
   Presence: 0,
 };
 
+const SHOW_BASE_ATTRIBUTES = false;
+
 export default function HeaderForm({
   initialValues,
   onChange,
@@ -48,14 +50,6 @@ export default function HeaderForm({
     keyTalent: initialValues?.keyTalent ?? "",
     attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
   }));
-
-  /*
-  const isAgent = form.path === "Agent";
-  const agentHighlights = useMemo(
-    () => new Set(["Awareness", "Intellect", "Speed"]),
-    []
-  );
-  */
 
   const highlightSet = useMemo(
     () => new Set(PATH_ATTRIBUTE_HIGHLIGHTS[form.path] || []),
@@ -181,6 +175,7 @@ export default function HeaderForm({
       </div>
 
       {/* Attributes */}
+      {SHOW_BASE_ATTRIBUTES && (
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-base font-semibold">Attributes</h3>
@@ -202,6 +197,7 @@ export default function HeaderForm({
           ].map(attributeInput)}
         </div>
       </section>
+      )}
     </div>
   );
 }
