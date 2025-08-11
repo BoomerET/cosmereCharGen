@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-//import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
+import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
 
 
 /**
