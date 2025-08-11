@@ -51,10 +51,11 @@ export default function HeaderForm({
     attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
   }));
 
-  //const highlightSet = useMemo(
-  //  () => new Set(PATH_ATTRIBUTE_HIGHLIGHTS[form.path] || []),
-  //  [form.path]
-  //);
+
+  const highlightSet = useMemo(
+    () => new Set(PATH_ATTRIBUTE_HIGHLIGHTS[form.path] || []),
+    [form.path]
+  );
 
   // Keep Key Talent in sync with Chosen Path
   useEffect(() => {
@@ -86,7 +87,7 @@ export default function HeaderForm({
 
   const attributeInput = (attrName) => {
     //const highlight = isAgent && agentHighlights.has(attrName);
-    //const highlight = highlightSet.has(attrName);
+    const highlight = highlightSet.has(attrName);
     return (
       <label
         key={attrName}
@@ -175,7 +176,6 @@ export default function HeaderForm({
       </div>
 
       {/* Attributes */}
-      {SHOW_BASE_ATTRIBUTES && (
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-base font-semibold">Attributes</h3>
@@ -197,7 +197,6 @@ export default function HeaderForm({
           ].map(attributeInput)}
         </div>
       </section>
-      )}
     </div>
   );
 }
