@@ -74,7 +74,7 @@ export const PATH_KEY_TALENT_MAP = {
   Warrior: 'Vigilant Stance',
 };
 
-const PATH_ATTRIBUTE_HIGHLIGHTS = {
+export const PATH_ATTRIBUTE_HIGHLIGHTS = {
   Agent:   ["Awareness", "Intellect", "Speed"],
   Envoy:   ["Presence", "Willpower"],
   Hunter:  ["Awareness", "Strength", "Speed"],
