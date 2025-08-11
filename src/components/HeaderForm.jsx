@@ -47,10 +47,17 @@ export default function HeaderForm({
     attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
   }));
 
+  /*
   const isAgent = form.path === "Agent";
   const agentHighlights = useMemo(
     () => new Set(["Awareness", "Intellect", "Speed"]),
     []
+  );
+  */
+
+  const highlightSet = useMemo(
+    () => new Set(PATH_ATTRIBUTE_HIGHLIGHTS[form.path] || []),
+    [form.path]
   );
 
   // Keep Key Talent in sync with Chosen Path
@@ -82,7 +89,8 @@ export default function HeaderForm({
     }));
 
   const attributeInput = (attrName) => {
-    const highlight = isAgent && agentHighlights.has(attrName);
+    //const highlight = isAgent && agentHighlights.has(attrName);
+    const highlight = highlightSet.has(attrName);
     return (
       <label
         key={attrName}
@@ -174,11 +182,12 @@ export default function HeaderForm({
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-base font-semibold">Attributes</h3>
-          {isAgent && (
+          {highlightSet.size > 0 && (
             <span className="text-xs font-medium text-amber-700">
-              Agent path selected — Awareness, Intellect, and Speed highlighted
+              {form.path} path — highlighted: {Array.from(highlightSet).join(", ")}
             </span>
           )}
+
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[

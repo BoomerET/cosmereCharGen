@@ -73,3 +73,12 @@ export const PATH_KEY_TALENT_MAP = {
   Scholar: 'Erudition',
   Warrior: 'Vigilant Stance',
 };
+
+const PATH_ATTRIBUTE_HIGHLIGHTS = {
+  Agent:   ["Awareness", "Intellect", "Speed"],
+  Envoy:   ["Presence", "Willpower"],
+  Hunter:  ["Awareness", "Strength", "Speed"],
+  Leader:  ["Presence", "Strength", "Willpower"],
+  Scholar: ["Intellect", "Presence", "Speed", "Strength"],
+  Warrior: ["Speed", "Strength", "Awareness", "Willpower"],
+};
