@@ -547,8 +547,8 @@ export default function CharacterBuilder() {
                 : "Export Fantasy Grounds XML"
           }
           className={`px-3 py-2 rounded border ${!hasPath || !attrsDone
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-blue-50"
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-blue-50"
             }`}
         >
           Export FG XML
@@ -561,43 +561,41 @@ export default function CharacterBuilder() {
         requirePathSelection
       />
 
-      {hasPath && (
-  <div className="mb-4">
-    <label htmlFor="cultural-expertise" className="block text-sm font-medium mb-1">
-      Cultural Expertise <span className="text-gray-500">(pick exactly 2)</span>
-    </label>
 
-    <select
-      id="cultural-expertise"
-      name="cultures"
-      multiple
-      size={Math.min(8, CULTURAL_EXPERTISE_OPTIONS.length)}
-      className="w-full rounded-md border border-gray-300 p-2"
-      value={char.cultures}
-      onChange={(e) => {
-        const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
-        const two = vals.slice(0, 2); // enforce max 2
-        setChar((prev) =>
-          prev.cultures?.length === two.length &&
-          prev.cultures.every((v, i) => v === two[i])
-            ? prev
-            : { ...prev, cultures: two }
-        );
-      }}
-    >
-      {CULTURAL_EXPERTISE_OPTIONS.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
+      <div className="mb-4">
+        <label htmlFor="cultural-expertise" className="block text-sm font-medium mb-1">
+          Cultural Expertise <span className="text-gray-500">(pick exactly 2)</span>
+        </label>
 
-    <p className="mt-1 text-xs text-gray-600">
-      Selected: <span className="font-medium">{char.cultures.length}</span> / 2
-    </p>
-  </div>
-)}
+        <select
+          id="cultural-expertise"
+          name="cultures"
+          multiple
+          size={Math.min(8, CULTURAL_EXPERTISE_OPTIONS.length)}
+          className="w-full rounded-md border border-gray-300 p-2"
+          value={char.cultures}
+          onChange={(e) => {
+            const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
+            const two = vals.slice(0, 2); // enforce max 2
+            setChar((prev) =>
+              prev.cultures?.length === two.length &&
+                prev.cultures.every((v, i) => v === two[i])
+                ? prev
+                : { ...prev, cultures: two }
+            );
+          }}
+        >
+          {CULTURAL_EXPERTISE_OPTIONS.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
 
+        <p className="mt-1 text-xs text-gray-600">
+          Selected: <span className="font-medium">{char.cultures.length}</span> / 2
+        </p>
+      </div>
 
       <div
         className="flex gap-2 border-b mb-2"
