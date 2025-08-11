@@ -1,9 +1,3 @@
-// constants.js
-export const CULTURE_OPTIONS = [
-  'Alethi','Azish','Herdazian','Iriali','Kharbranthian',
-  'Listeners','Natan','Reshi','Shin','Thaylen','Unkalaki','Veden'
-];
-
 export const STARTING_PATHS = ['Agent','Envoy','Hunter','Leader','Scholar','Warrior'];
 
 // Centralized attribute list + points
