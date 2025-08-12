@@ -104,15 +104,6 @@ if (newPath != null && newPath !== prev.startingPath) {
   changed = true;
 }
 
-// render: Key Talent tab props
-{tab === "key" && (
-  <KeyTalentTab
-    startingPath={char.startingPath}
-    value={char.keyTalent}
-    onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
-  />
-)}
-
 
         setAttr("strength", payload.strength);
         setAttr("speed", payload.speed);
@@ -614,7 +605,13 @@ if (newPath != null && newPath !== prev.startingPath) {
         />
       )}
 
-      {tab === "key" && <KeyTalentTab startingPath={char.startingPath} />}
+      {tab === "key" && (
+  <KeyTalentTab
+    startingPath={char.startingPath}
+    value={char.keyTalent}
+    onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
+  />
+)}
 
       {tab === "expertise" && (
         <ExpertiseList
