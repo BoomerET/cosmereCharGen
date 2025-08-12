@@ -5,7 +5,8 @@ import StatsTab from "./StatsTab";
 import SkillsList from "./SkillsList";
 import ListSection from "./ListSection";
 import ExpertiseList from "./ExpertiseList";
-import { SKILL_LIST, PATH_KEY_TALENT_MAP, CULTURAL_EXPERTISE_OPTIONS } from "../../globals/constants";
+import KeyTalentTab from "./KeyTalentTab";
+import { SKILL_LIST } from "../../globals/constants";
 
 export default function CharacterBuilder() {
   const [char, setChar] = useState({
@@ -25,39 +26,30 @@ export default function CharacterBuilder() {
     surges: [],
     radiancePowers: [],
     expertise: [],
+    keyTalent: "",
   });
 
   const [tab, setTab] = useState("stats");
 
-  const stats = [
-    "strength",
-    "speed",
-    "intellect",
-    "willpower",
-    "awareness",
-    "presence",
-  ];
+  const stats = ["strength","speed","intellect","willpower","awareness","presence"];
   const total = stats.reduce((sum, s) => sum + char[s], 0);
   const remaining = 12 - total;
   const hasPath = !!char.startingPath;
   const attrsDone = remaining === 0;
-  const hasTwoCultures = (char.cultures?.length || 0) === 2;
 
   const isTabAccessible = (id) => {
     if (id === "stats") return true;
     const baseUnlocked = hasPath && attrsDone;
     if (!baseUnlocked) return false;
-    if (id === "expertise") return hasTwoCultures;
     return true;
   };
 
   useEffect(() => {
     if (!isTabAccessible(tab)) setTab("stats");
-  }, [tab, hasPath, attrsDone, hasTwoCultures]);
+  }, [tab, hasPath, attrsDone]);
 
   // Accepts either a DOM-like event or a plain object from HeaderForm
   const handleHeaderChange = (arg) => {
-    // Local helper that merges a form payload *only when values actually change*
     const mergeFromPayload = (payload) => {
       if (!payload || typeof payload !== "object") return;
 
@@ -89,20 +81,12 @@ export default function CharacterBuilder() {
           changed = true;
         }
 
-        // Ancestry & cultures
+        // Ancestry & attributes
         if (typeof payload.ancestry === "string" && payload.ancestry !== prev.ancestry) {
           next.ancestry = payload.ancestry;
           changed = true;
         }
-        if (Array.isArray(payload.cultures)) {
-          const nextCult = payload.cultures.slice(0, 2);
-          if (JSON.stringify(nextCult) !== JSON.stringify(prev.cultures)) {
-            next.cultures = nextCult;
-            changed = true;
-          }
-        }
 
-        // Attributes (flat or nested)
         const clamp = (n) => Math.max(0, Math.min(3, Number(n) || 0));
         const setAttr = (key, raw) => {
           if (raw == null) return;
@@ -112,6 +96,23 @@ export default function CharacterBuilder() {
             changed = true;
           }
         };
+
+  // when path changes (in handleHeaderChange), clear keyTalent if it no longer applies:
+if (newPath != null && newPath !== prev.startingPath) {
+  next.startingPath = newPath;
+  next.keyTalent = "";      // reset selection on path change
+  changed = true;
+}
+
+// render: Key Talent tab props
+{tab === "key" && (
+  <KeyTalentTab
+    startingPath={char.startingPath}
+    value={char.keyTalent}
+    onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
+  />
+)}
+
 
         setAttr("strength", payload.strength);
         setAttr("speed", payload.speed);
@@ -134,27 +135,24 @@ export default function CharacterBuilder() {
           }
         }
 
-        // Clean up any accidental field from earlier handlers
         if ("headerForm" in next) {
           delete next.headerForm;
           changed = true;
         }
 
-        return changed ? next : prev; // no-op if nothing changed
+        return changed ? next : prev;
       });
     };
 
-    // 1) DOM-like event path
+    // DOM-like event path
     if (arg && arg.target) {
       const { name, value, multiple, selectedOptions } = arg.target;
 
-      // Our HeaderForm sends a synthetic event named "headerForm" → treat as object payload
       if (name === "headerForm") {
         mergeFromPayload(value);
         return;
       }
 
-      // Otherwise, this is a normal input/select from some other part of the UI
       const val = multiple
         ? Array.from(selectedOptions).map((o) => o.value).slice(0, 2)
         : value;
@@ -170,7 +168,7 @@ export default function CharacterBuilder() {
       return;
     }
 
-    // 2) Plain object payload path
+    // Plain object payload path
     const payload = arg && arg.target ? arg.target.value : arg;
     if (!payload || typeof payload !== "object") {
       console.warn("Unexpected onChange payload from HeaderForm:", arg);
@@ -178,7 +176,6 @@ export default function CharacterBuilder() {
     }
     mergeFromPayload(payload);
   };
-
 
   const changeStat = (stat, delta) => {
     setChar((prev) => {
@@ -202,24 +199,38 @@ export default function CharacterBuilder() {
     });
   };
 
-  const addListItem = (field) =>
-    setChar((prev) => ({ ...prev, [field]: [...prev[field], ""] }));
-  const updateListItem = (field, i, val) =>
+  // Toggle cultural expertise (exactly 2)
+  const toggleCulture = (label) => {
     setChar((prev) => {
-      const arr = [...prev[field]];
-      arr[i] = val;
-      return { ...prev, [field]: arr };
+      const cur = new Set(prev.cultures || []);
+      if (cur.has(label)) {
+        cur.delete(label);
+      } else {
+        if (cur.size >= 2) return prev; // enforce cap
+        cur.add(label);
+      }
+      return { ...prev, cultures: Array.from(cur) };
     });
-  const removeListItem = (field, i) =>
-    setChar((prev) => ({
-      ...prev,
-      [field]: prev[field].filter((_, idx) => idx !== i),
-    }));
+  };
+
+  // Toggle extra expertise (cap = Intellect)
+  const toggleExtraExpertise = (label) => {
+    setChar((prev) => {
+      const has = prev.expertise.includes(label);
+      if (has) {
+        return { ...prev, expertise: prev.expertise.filter((x) => x !== label) };
+      }
+      const maxExtras = Math.max(0, Number(prev.intellect) || 0);
+      if (prev.expertise.length >= maxExtras) return prev;
+      return { ...prev, expertise: [...prev.expertise, label] };
+    });
+  };
 
   const TAB_CONFIG = [
     { id: "stats", label: "Attributes" },
     { id: "skills", label: "Skills" },
-    { id: "expertise", label: "Expertise" },
+    { id: "key", label: "Talents" },           // NEW TAB
+    { id: "expertise", label: "Expertise" },       // now includes Cultural Expertise checkboxes
     { id: "surges", label: "Surges" },
     { id: "radiant", label: "Radiant Powers" },
   ];
@@ -227,14 +238,11 @@ export default function CharacterBuilder() {
   const tooltipFor = (id) => {
     if (id === "stats") return undefined;
     if (!hasPath) return "Select a starting path to unlock tabs";
-    if (!attrsDone)
-      return `Distribute all attribute points — ${remaining} remaining`;
-    if (id === "expertise" && !hasTwoCultures)
-      return "Choose 2 Cultural Expertise to unlock";
+    if (!attrsDone) return `Distribute all attribute points — ${remaining} remaining`;
     return undefined;
   };
 
-  // ===== Enhanced Fantasy Grounds XML export (ancestry w/o culture) =====
+  /* ===== FG XML export helpers and download (unchanged behavior) ===== */
   const escapeXML = (s = "") =>
     String(s)
       .replace(/&/g, "&amp;")
@@ -291,13 +299,14 @@ export default function CharacterBuilder() {
       0
     );
 
-  // normalize “Listeners” -> “Listener” for culture labels if you ever surface them elsewhere
   const normalizeCulture = (c) => (c === "Listeners" ? "Listener" : c);
 
   const buildFGXML = () => {
     const name = char.characterName || "Unnamed Character";
     const path = char.startingPath || "";
     const level = Number(char.level) || 1;
+    const keyTalent = (char.keyTalent || "").trim();
+    const hasKeyTalent = Boolean(keyTalent);
 
     const physicalDef =
       10 + (Number(char.strength) || 0) + (Number(char.speed) || 0);
@@ -313,8 +322,8 @@ export default function CharacterBuilder() {
     const senses = sensesString(Number(char.awareness) || 0);
     const recdie = recoveryDie(Number(char.willpower) || 0);
 
-    const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
-    const hasKeyTalent = Boolean(keyTalent);
+    //const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
+    //const hasKeyTalent = Boolean(keyTalent);
 
     const carry = carryMax(Number(char.strength) || 0);
     const lift = liftMax(Number(char.strength) || 0);
@@ -368,9 +377,7 @@ export default function CharacterBuilder() {
     </paths>`
       : "<paths />";
 
-    // Ancestry name: DO NOT include culture
     const ancestryName = char.ancestry || "Human";
-
     const totalsRanks = sumSkillRanks();
     const totalTalents = hasKeyTalent ? 1 : 0;
     const tier = 1;
@@ -393,18 +400,12 @@ export default function CharacterBuilder() {
     </ancestry>
 
     <attributes>
-      <awareness><score type="number">${Number(char.awareness) || 0
-      }</score></awareness>
-      <intellect><score type="number">${Number(char.intellect) || 0
-      }</score></intellect>
-      <presence><score type="number">${Number(char.presence) || 0
-      }</score></presence>
-      <speed><bonus type="number">0</bonus><score type="number">${Number(char.speed) || 0
-      }</score></speed>
-      <strength><score type="number">${Number(char.strength) || 0
-      }</score></strength>
-      <willpower><score type="number">${Number(char.willpower) || 0
-      }</score></willpower>
+      <awareness><score type="number">${Number(char.awareness) || 0}</score></awareness>
+      <intellect><score type="number">${Number(char.intellect) || 0}</score></intellect>
+      <presence><score type="number">${Number(char.presence) || 0}</score></presence>
+      <speed><bonus type="number">0</bonus><score type="number">${Number(char.speed) || 0}</score></speed>
+      <strength><score type="number">${Number(char.strength) || 0}</score></strength>
+      <willpower><score type="number">${Number(char.willpower) || 0}</score></willpower>
     </attributes>
 
     <coins>
@@ -478,7 +479,6 @@ export default function CharacterBuilder() {
       }
     </talent>
 
-
     <tier type="number">${tier}</tier>
     <totalskillranks type="number">${totalsRanks}</totalskillranks>
     <totaltalents type="number">${totalTalents}</totaltalents>
@@ -520,10 +520,7 @@ export default function CharacterBuilder() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${(char.characterName || "character").replace(
-      /[^a-z0-9-_]/gi,
-      "_"
-    )}.xml`;
+    a.download = `${(char.characterName || "character").replace(/[^a-z0-9-_]/gi, "_")}.xml`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -532,7 +529,6 @@ export default function CharacterBuilder() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      {/* <h1 className="text-3xl font-bold mb-4">Cosmere RPG Character Creator</h1> */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-3xl font-bold">Cosmere RPG Character Creator</h1>
         <button
@@ -546,56 +542,13 @@ export default function CharacterBuilder() {
                 ? "Distribute all attribute points first"
                 : "Export Fantasy Grounds XML"
           }
-          className={`px-3 py-2 rounded border ${!hasPath || !attrsDone
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:bg-blue-50"
-            }`}
+          className={`px-3 py-2 rounded border ${!hasPath || !attrsDone ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-50"}`}
         >
           Export FG XML
         </button>
       </div>
 
-      <HeaderForm
-        char={char}
-        onChange={handleHeaderChange}
-        requirePathSelection
-      />
-
-
-      <div className="mb-4">
-        <label htmlFor="cultural-expertise" className="block text-sm font-medium mb-1">
-          Cultural Expertise <span className="text-gray-500">(pick exactly 2)</span>
-        </label>
-
-        <select
-          id="cultural-expertise"
-          name="cultures"
-          multiple
-          size={Math.min(8, CULTURAL_EXPERTISE_OPTIONS.length)}
-          className="w-full rounded-md border border-gray-300 p-2"
-          value={char.cultures}
-          onChange={(e) => {
-            const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
-            const two = vals.slice(0, 2); // enforce max 2
-            setChar((prev) =>
-              prev.cultures?.length === two.length &&
-                prev.cultures.every((v, i) => v === two[i])
-                ? prev
-                : { ...prev, cultures: two }
-            );
-          }}
-        >
-          {CULTURAL_EXPERTISE_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-
-        <p className="mt-1 text-xs text-gray-600">
-          Selected: <span className="font-medium">{char.cultures.length}</span> / 2
-        </p>
-      </div>
+      <HeaderForm onChange={handleHeaderChange} />
 
       <div
         className="flex gap-2 border-b mb-2"
@@ -617,8 +570,7 @@ export default function CharacterBuilder() {
                 if (disabled) return;
                 setTab(tabItem.id);
               }}
-              className={`px-4 py-2 -mb-[2px] border-b-2 transition-colors ${disabled ? "opacity-50 cursor-not-allowed" : ""
-                }
+              className={`px-4 py-2 -mb-[2px] border-b-2 transition-colors ${disabled ? "opacity-50 cursor-not-allowed" : ""}
                 ${tab === tabItem.id
                   ? "border-blue-500 text-blue-800 font-semibold"
                   : "border-transparent text-gray-600 hover:text-blue-700"
@@ -642,13 +594,6 @@ export default function CharacterBuilder() {
           <span className="font-medium">{remaining}</span> remaining.
         </p>
       )}
-      {hasPath && attrsDone && !hasTwoCultures && (
-        <p className="mb-2 text-sm text-gray-600">
-          Pick exactly two items in{" "}
-          <span className="font-medium">Cultural Expertise</span> to unlock the
-          Expertise tab.
-        </p>
-      )}
 
       {tab === "stats" && (
         <StatsTab
@@ -669,18 +614,13 @@ export default function CharacterBuilder() {
         />
       )}
 
+      {tab === "key" && <KeyTalentTab startingPath={char.startingPath} />}
+
       {tab === "expertise" && (
         <ExpertiseList
           char={char}
-          onToggle={(opt) => {
-            const has = char.expertise.includes(opt);
-            setChar((prev) => ({
-              ...prev,
-              expertise: has
-                ? prev.expertise.filter((x) => x !== opt)
-                : [...prev.expertise, opt],
-            }));
-          }}
+          onToggleCulture={toggleCulture}
+          onToggleExtra={toggleExtraExpertise}
         />
       )}
 
@@ -688,9 +628,17 @@ export default function CharacterBuilder() {
         <ListSection
           title="Surges"
           items={char.surges}
-          onAdd={() => addListItem("surges")}
-          onChangeItem={(i, v) => updateListItem("surges", i, v)}
-          onRemove={(i) => removeListItem("surges", i)}
+          onAdd={() => setChar((p) => ({ ...p, surges: [...p.surges, ""] }))}
+          onChangeItem={(i, v) =>
+            setChar((p) => {
+              const arr = [...p.surges];
+              arr[i] = v;
+              return { ...p, surges: arr };
+            })
+          }
+          onRemove={(i) =>
+            setChar((p) => ({ ...p, surges: p.surges.filter((_, idx) => idx !== i) }))
+          }
         />
       )}
 
@@ -698,9 +646,17 @@ export default function CharacterBuilder() {
         <ListSection
           title="Radiant Powers"
           items={char.radiancePowers}
-          onAdd={() => addListItem("radiancePowers")}
-          onChangeItem={(i, v) => updateListItem("radiancePowers", i, v)}
-          onRemove={(i) => removeListItem("radiancePowers", i)}
+          onAdd={() => setChar((p) => ({ ...p, radiancePowers: [...p.radiancePowers, ""] }))}
+          onChangeItem={(i, v) =>
+            setChar((p) => {
+              const arr = [...p.radiancePowers];
+              arr[i] = v;
+              return { ...p, radiancePowers: arr };
+            })
+          }
+          onRemove={(i) =>
+            setChar((p) => ({ ...p, radiancePowers: p.radiancePowers.filter((_, idx) => idx !== i) }))
+          }
         />
       )}
     </div>
@@ -708,5 +664,6 @@ export default function CharacterBuilder() {
 }
 
 CharacterBuilder.propTypes = {
-  // no props expected currently, but defining for potential future
+  // no props expected currently
 };
+

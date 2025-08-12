@@ -1,31 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
 
-
 /**
- * HeaderForm.jsx
- *
- * - Highlights Awareness, Intellect, and Speed when Chosen Path is "Agent"
- * - Auto-populates Key Talent from Chosen Path
- * - Exposes derived `totalTalents` (1 if Key Talent exists, else 0) via onChange
- *
- * Props (optional):
- *  - initialValues: {
- *      name, level, path, keyTalent,
- *      attributes: { Strength, Speed, Intellect, Willpower, Awareness, Presence }
- *    }
- *  - onChange(formState) -> void  (called whenever form state changes)
+ * Highlights attributes based on Chosen Path.
+ * (Key Talent & Cultural Expertise moved to their own tabs.)
  */
-
-const PATH_TO_KEY_TALENT = {
-  Agent: "Opportunist",
-  Envoy: "Rousing Presence",
-  Hunter: "Seek Quarry",
-  Leader: "Decisive Command",
-  Scholar: "Erudition",
-  Warrior: "Vigilant Stance",
-};
-
 const DEFAULT_ATTRIBUTES = {
   Strength: 0,
   Speed: 0,
@@ -35,46 +14,24 @@ const DEFAULT_ATTRIBUTES = {
   Presence: 0,
 };
 
-const SHOW_BASE_ATTRIBUTES = false;
-
-export default function HeaderForm({
-  initialValues,
-  onChange,
-}) {
+export default function HeaderForm({ initialValues, onChange }) {
   const [form, setForm] = useState(() => ({
     name: initialValues?.name ?? "",
     level: Number.isFinite(Number(initialValues?.level))
       ? Number(initialValues.level)
       : 1,
     path: initialValues?.path ?? "",
-    keyTalent: initialValues?.keyTalent ?? "",
     attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
   }));
-
 
   const highlightSet = useMemo(
     () => new Set(PATH_ATTRIBUTE_HIGHLIGHTS[form.path] || []),
     [form.path]
   );
 
-  // Keep Key Talent in sync with Chosen Path
   useEffect(() => {
-    const mapped = PATH_TO_KEY_TALENT[form.path] || "";
-    if (mapped !== form.keyTalent) {
-      setForm((prev) => ({ ...prev, keyTalent: mapped }));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.path]);
-
-  // Derived: totalTalents (for FG XML export elsewhere)
-  const totalTalents = form.keyTalent ? 1 : 0;
-
-  // Bubble state upward whenever it changes
-  useEffect(() => {
-    if (typeof onChange === "function") {
-      onChange?.({ ...form, totalTalents });
-    }
-  }, [form, totalTalents, onChange]);
+    onChange?.({ ...form });
+  }, [form, onChange]);
 
   const updateField = (field, value) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -86,7 +43,6 @@ export default function HeaderForm({
     }));
 
   const attributeInput = (attrName) => {
-    //const highlight = isAgent && agentHighlights.has(attrName);
     const highlight = highlightSet.has(attrName);
     return (
       <label
@@ -153,28 +109,6 @@ export default function HeaderForm({
         </label>
       </div>
 
-      {/* Key Talent (auto) */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <label className="flex flex-col gap-1 md:col-span-1">
-          <span className="text-sm font-medium">Key Talent</span>
-          <input
-            type="text"
-            className="rounded-md border border-gray-300 p-2 bg-gray-50"
-            value={form.keyTalent}
-            onChange={(e) => updateField("keyTalent", e.target.value)}
-            placeholder="Auto-set from Chosen Path"
-          />
-          <span className="text-xs text-gray-500">
-            Auto-filled based on Chosen Path (editable if needed).
-          </span>
-        </label>
-
-        {/* Derived field (hidden in UI but available to parent via onChange) */}
-        <div className="hidden">
-          <input type="number" value={totalTalents} readOnly />
-        </div>
-      </div>
-
       {/* Attributes */}
       <section>
         <div className="mb-2 flex items-center justify-between">
@@ -184,7 +118,6 @@ export default function HeaderForm({
               {form.path} path — highlighted: {Array.from(highlightSet).join(", ")}
             </span>
           )}
-
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
