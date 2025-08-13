@@ -31,7 +31,7 @@ export default function CharacterBuilder() {
 
   const [tab, setTab] = useState("stats");
 
-  const stats = ["strength","speed","intellect","willpower","awareness","presence"];
+  const stats = ["strength", "speed", "intellect", "willpower", "awareness", "presence"];
   const total = stats.reduce((sum, s) => sum + char[s], 0);
   const remaining = 12 - total;
   const hasPath = !!char.startingPath;
@@ -92,8 +92,8 @@ export default function CharacterBuilder() {
           }, {});
 
           // reset culture & extra expertise
-          next.cultures  = [];
-          next.expertise = [];         
+          next.cultures = [];
+          next.expertise = [];
 
           changed = true;
         }
@@ -114,12 +114,12 @@ export default function CharacterBuilder() {
           }
         };
 
-  // when path changes (in handleHeaderChange), clear keyTalent if it no longer applies:
-if (newPath != null && newPath !== prev.startingPath) {
-  next.startingPath = newPath;
-  next.keyTalent = "";      // reset selection on path change
-  changed = true;
-}
+        // when path changes (in handleHeaderChange), clear keyTalent if it no longer applies:
+        if (newPath != null && newPath !== prev.startingPath) {
+          next.startingPath = newPath;
+          next.keyTalent = "";      // reset selection on path change
+          changed = true;
+        }
 
 
         setAttr("strength", payload.strength);
@@ -558,22 +558,22 @@ if (newPath != null && newPath !== prev.startingPath) {
 
       {/* <HeaderForm onChange={handleHeaderChange} /> */}
       <HeaderForm
-  key={char.startingPath} // remount on path change
-  initialValues={{
-    name: char.characterName,
-    level: char.level,
-    path: char.startingPath,
-    attributes: {
-      Strength:  char.strength,
-      Speed:     char.speed,
-      Intellect: char.intellect,
-      Willpower: char.willpower,
-      Awareness: char.awareness,
-      Presence:  char.presence,
-    },
-  }}
-  onChange={handleHeaderChange}
-/>
+        key={char.startingPath} // remount on path change
+        initialValues={{
+          name: char.characterName,
+          level: char.level,
+          path: char.startingPath,
+          attributes: {
+            Strength: char.strength,
+            Speed: char.speed,
+            Intellect: char.intellect,
+            Willpower: char.willpower,
+            Awareness: char.awareness,
+            Presence: char.presence,
+          },
+        }}
+        onChange={handleHeaderChange}
+      />
 
 
       <div
@@ -641,12 +641,12 @@ if (newPath != null && newPath !== prev.startingPath) {
       )}
 
       {tab === "key" && (
-  <KeyTalentTab
-    startingPath={char.startingPath}
-    value={char.keyTalent}
-    onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
-  />
-)}
+        <KeyTalentTab
+          startingPath={char.startingPath}
+          value={char.keyTalent}
+          onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
+        />
+      )}
 
       {tab === "expertise" && (
         <ExpertiseList

@@ -14,7 +14,7 @@ export default function SkillsList({ char, startingPath, onChangeRank }) {
 
   const extraSpent = SKILL_LIST.reduce((sum, { name }) => {
     const actual = char.skills[name] || 0;
-    const base   = name === freeSkill ? 1 : 0;
+    const base = name === freeSkill ? 1 : 0;
     return sum + Math.max(0, actual - base);
   }, 0);
   const maxExtras = 4;

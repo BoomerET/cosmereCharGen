@@ -2,10 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const PATH_TALENT_CHOICES = {
-  Agent:   ["Investigator", "Spy", "Thief"],
-  Envoy:   ["Diplomat", "Faithful", "Mentor"],
-  Hunter:  ["Archer", "Assassin", "Tracker"],
-  Leader:  ["Champion", "Officer", "Politico"],
+  Agent: ["Investigator", "Spy", "Thief"],
+  Envoy: ["Diplomat", "Faithful", "Mentor"],
+  Hunter: ["Archer", "Assassin", "Tracker"],
+  Leader: ["Champion", "Officer", "Politico"],
   Scholar: ["Artifabrian", "Strategist", "Surgeon"],
   Warrior: ["Duelist", "Shardbearer", "Soldier"],
 };
