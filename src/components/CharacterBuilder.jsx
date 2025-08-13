@@ -220,8 +220,8 @@ if (newPath != null && newPath !== prev.startingPath) {
   const TAB_CONFIG = [
     { id: "stats", label: "Attributes" },
     { id: "skills", label: "Skills" },
-    { id: "key", label: "Talents" },           // NEW TAB
-    { id: "expertise", label: "Expertise" },       // now includes Cultural Expertise checkboxes
+    { id: "expertise", label: "Expertise" },
+    { id: "key", label: "Talents" },
     { id: "surges", label: "Surges" },
     { id: "radiant", label: "Radiant Powers" },
   ];

@@ -52,14 +52,22 @@ export default function HeaderForm({ initialValues, onChange }) {
       `}
       >
         <span className="text-sm font-medium">{attrName}</span>
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          className="w-24 rounded-md border border-gray-300 p-2 text-right"
-          value={form.attributes[attrName]}
-          onChange={(e) => updateAttr(attrName, e.target.value)}
-        />
+       <input
+  type="number"
+  inputMode="numeric"
+  min={0}
+  max={3}
+  className="w-24 rounded-md border border-gray-300 p-2 text-right"
+  value={form.attributes[attrName]}
+  onChange={(e) => {
+    let val = Number(e.target.value);
+    if (Number.isNaN(val)) {
+      val = 0; // reset immediately if not numeric
+    }
+    const clamped = Math.max(0, Math.min(3, val));
+    updateAttr(attrName, clamped);
+  }}
+/>
       </label>
     );
   };
@@ -82,13 +90,21 @@ export default function HeaderForm({ initialValues, onChange }) {
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Level</span>
           <input
-            type="number"
-            inputMode="numeric"
-            min={1}
-            className="rounded-md border border-gray-300 p-2"
-            value={form.level}
-            onChange={(e) => updateField("level", Number(e.target.value) || 1)}
-          />
+  type="number"
+  inputMode="numeric"
+  min={1}
+  max={10}
+  className="rounded-md border border-gray-300 p-2"
+  value={form.level}
+  onChange={(e) => {
+    let val = Number(e.target.value);
+    if (Number.isNaN(val)) {
+      val = 0; // reset if non-numeric
+    }
+    const clamped = Math.max(0, Math.min(3, val));
+    updateField("level", clamped);
+  }}
+/>
         </label>
 
         <label className="flex flex-col gap-1">
@@ -113,11 +129,13 @@ export default function HeaderForm({ initialValues, onChange }) {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-base font-semibold">Attributes</h3>
-          {highlightSet.size > 0 && (
-            <span className="text-xs font-medium text-amber-700">
+          {/*
+           {highlightSet.size > 0 && (
+              <span className="text-xs font-medium text-amber-700">
               {form.path} path — highlighted: {Array.from(highlightSet).join(", ")}
             </span>
           )}
+          */}
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
