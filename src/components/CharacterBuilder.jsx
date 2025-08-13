@@ -315,9 +315,8 @@ export default function CharacterBuilder() {
   const buildFGXML = () => {
     const name = char.characterName || "Unnamed Character";
     const path = char.startingPath || "";
+    const keySpecialty = char.keySpecialty || "";
     const level = Number(char.level) || 1;
-    //const keyTalent = (char.keyTalent || "").trim();
-    //const hasKeyTalent = Boolean(keyTalent);
 
     const physicalDef =
       10 + (Number(char.strength) || 0) + (Number(char.speed) || 0);
@@ -468,7 +467,7 @@ export default function CharacterBuilder() {
     <level type="number">${level}</level>
     <movement type="number">${move}</movement>
     <name type="string">${escapeXML(name)}</name>
-    <path type="string">${escapeXML(path)}</path>
+    <path type="string">${escapeXML(path)} (${escapeXML(keySpecialty)})</path>
     ${pathBlock}
     <recdie type="dice">${recdie}</recdie>
     <senses type="string">${escapeXML(senses)}</senses>
