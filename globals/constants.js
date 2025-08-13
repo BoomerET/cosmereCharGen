@@ -76,3 +76,13 @@ export const PATH_ATTRIBUTE_HIGHLIGHTS = {
   Scholar: ["Intellect", "Presence", "Speed", "Strength"],
   Warrior: ["Speed", "Strength", "Awareness", "Willpower"],
 };
+
+export const PATH_TALENT_CHOICES = {
+  Agent: ["Investigator", "Spy", "Thief"],
+  Envoy: ["Diplomat", "Faithful", "Mentor"],
+  Hunter: ["Archer", "Assassin", "Tracker"],
+  Leader: ["Champion", "Officer", "Politico"],
+  Scholar: ["Artifabrian", "Strategist", "Surgeon"],
+  Warrior: ["Duelist", "Shardbearer", "Soldier"],
+};
+

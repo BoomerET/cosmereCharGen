@@ -6,7 +6,7 @@ import SkillsList from "./SkillsList";
 import ListSection from "./ListSection";
 import ExpertiseList from "./ExpertiseList";
 import KeyTalentTab from "./KeyTalentTab";
-import { SKILL_LIST } from "../../globals/constants";
+import { SKILL_LIST, PATH_KEY_TALENT_MAP } from "../../globals/constants";
 
 export default function CharacterBuilder() {
   const [char, setChar] = useState({
@@ -313,8 +313,8 @@ export default function CharacterBuilder() {
     const name = char.characterName || "Unnamed Character";
     const path = char.startingPath || "";
     const level = Number(char.level) || 1;
-    const keyTalent = (char.keyTalent || "").trim();
-    const hasKeyTalent = Boolean(keyTalent);
+    //const keyTalent = (char.keyTalent || "").trim();
+    //const hasKeyTalent = Boolean(keyTalent);
 
     const physicalDef =
       10 + (Number(char.strength) || 0) + (Number(char.speed) || 0);
@@ -330,8 +330,8 @@ export default function CharacterBuilder() {
     const senses = sensesString(Number(char.awareness) || 0);
     const recdie = recoveryDie(Number(char.willpower) || 0);
 
-    //const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
-    //const hasKeyTalent = Boolean(keyTalent);
+    const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
+    const hasKeyTalent = Boolean(keyTalent);
 
     const carry = carryMax(Number(char.strength) || 0);
     const lift = liftMax(Number(char.strength) || 0);
