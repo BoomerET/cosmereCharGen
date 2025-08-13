@@ -16,22 +16,6 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
   const keyTalent = PATH_KEY_TALENT_MAP[startingPath] || "";
 
   // helpers
-  //const reqText = (req = {}) =>
-  //  Object.entries(req).map(([skill, min]) => `${skill} ≥ ${min}`).join(", ");
-
-  //const meets = (req = {}) =>
-  //  Object.entries(req).every(([skill, min]) => (skills?.[skill] || 0) >= min);
-
-  
-  const reqText = (req = {}) =>
-    Object.entries(req).map(([skill, min]) => `${skill} mod ≥ ${min}`).join(", ");
-
-  const meets = (req = {}) =>
-    Object.entries(req).every(([skill, min]) => getSkillMod(skill) >= min);
-
-
-
-
   const pickDefs =
     KEY_TALENT_SPECIALTY_PICKS[startingPath]?.[value] || [];
 
@@ -47,6 +31,12 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
     const stat = base ? (char?.[base] || 0) : 0;  // attribute value
     return ranks + stat;                            // <-- MOD
   };
+
+  const reqText = (req = {}) =>
+    Object.entries(req).map(([skill, min]) => `${skill} mod ≥ ${min}`).join(", ");
+
+  const meets = (req = {}) =>
+    Object.entries(req).every(([skill, min]) => getSkillMod(skill) >= min);
 
   return (
     <div className="mb-6">
