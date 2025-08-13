@@ -78,6 +78,9 @@ export default function CharacterBuilder() {
         const newPath = payload.startingPath ?? payload.path;
         if (newPath != null && newPath !== prev.startingPath) {
           next.startingPath = newPath;
+          next.keyTalent = "";      // keep if you still use this elsewhere
+          next.keySpecialty = "";   // NEW
+          next.keyPick = "";        // NEW
           next.strength = 0;
           next.speed = 0;
           next.intellect = 0;
@@ -643,10 +646,14 @@ export default function CharacterBuilder() {
       {tab === "key" && (
         <KeyTalentTab
           startingPath={char.startingPath}
-          value={char.keyTalent}
-          onSelect={(opt) => setChar((p) => ({ ...p, keyTalent: opt }))}
+          value={char.keySpecialty}
+          onSelect={(opt) => setChar((p) => ({ ...p, keySpecialty: opt, keyPick: "" }))}
+          pick={char.keyPick}
+          onSelectPick={(pick) => setChar((p) => ({ ...p, keyPick: pick }))}
+          skills={char.skills}
         />
       )}
+
 
       {tab === "expertise" && (
         <ExpertiseList

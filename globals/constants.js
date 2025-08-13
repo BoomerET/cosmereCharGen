@@ -86,3 +86,22 @@ export const PATH_TALENT_CHOICES = {
   Warrior: ["Duelist", "Shardbearer", "Soldier"],
 };
 
+// For specialties that unlock one pick, gated by skill ranks
+export const KEY_TALENT_SPECIALTY_PICKS = {
+  Agent: {
+    Investigator: [
+      { name: "Watchful Eye", requires: { Deduction: 1 } },
+      { name: "Get 'Em Talking", requires: { Insight: 2 } },
+    ],
+    Spy: [
+      { name: "Sure Outcome", requires: { Insight: 2 } },
+      { name: "Plausible Excuse", requires: { Deception: 1 } },
+    ],
+    Thief: [
+      { name: "Risky Behavior", requires: { Insight: 2 } },
+      { name: "Cheap Shot" },
+      // { name: "Cheap Shot", requires: { Insight: 2 } },
+    ]
+  }
+  // Envoy: { ... }, Hunter: { ... } etc.
+};
