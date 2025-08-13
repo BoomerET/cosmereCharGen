@@ -651,6 +651,7 @@ export default function CharacterBuilder() {
           pick={char.keyPick}
           onSelectPick={(pick) => setChar((p) => ({ ...p, keyPick: pick }))}
           skills={char.skills}
+          char={char}
         />
       )}
 

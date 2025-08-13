@@ -4,18 +4,33 @@ import {
   PATH_KEY_TALENT_MAP,
   PATH_TALENT_CHOICES,
   KEY_TALENT_SPECIALTY_PICKS,
+  SKILL_LIST,
 } from "../../globals/constants";
+
+const BASE_BY_SKILL = Object.fromEntries(
+  SKILL_LIST.map(({ name, base }) => [name, base])
+);
 
 export default function KeyTalentTab({ startingPath, value, onSelect, skills, pick, onSelectPick }) {
   const options = PATH_TALENT_CHOICES[startingPath] || [];
   const keyTalent = PATH_KEY_TALENT_MAP[startingPath] || "";
 
   // helpers
+  //const reqText = (req = {}) =>
+  //  Object.entries(req).map(([skill, min]) => `${skill} ≥ ${min}`).join(", ");
+
+  //const meets = (req = {}) =>
+  //  Object.entries(req).every(([skill, min]) => (skills?.[skill] || 0) >= min);
+
+  
   const reqText = (req = {}) =>
-    Object.entries(req).map(([skill, min]) => `${skill} ≥ ${min}`).join(", ");
+    Object.entries(req).map(([skill, min]) => `${skill} mod ≥ ${min}`).join(", ");
 
   const meets = (req = {}) =>
-    Object.entries(req).every(([skill, min]) => (skills?.[skill] || 0) >= min);
+    Object.entries(req).every(([skill, min]) => getSkillMod(skill) >= min);
+
+
+
 
   const pickDefs =
     KEY_TALENT_SPECIALTY_PICKS[startingPath]?.[value] || [];
@@ -25,6 +40,13 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
   if (pick && !eligibleNames.has(pick)) {
     onSelectPick?.("");
   }
+
+  const getSkillMod = (skillName) => {
+    const base = BASE_BY_SKILL[skillName];         // e.g., Deduction -> 'intellect'
+    const ranks = char?.skills?.[skillName] || 0;  // ranks from SkillsList
+    const stat = base ? (char?.[base] || 0) : 0;  // attribute value
+    return ranks + stat;                            // <-- MOD
+  };
 
   return (
     <div className="mb-6">
@@ -92,9 +114,18 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
 
 KeyTalentTab.propTypes = {
   startingPath: PropTypes.string.isRequired,
-  value: PropTypes.string,                 // selected specialty (e.g., "Investigator")
-  onSelect: PropTypes.func.isRequired,     // (specialty) => void
-  skills: PropTypes.object,                // { Deduction: 0..5, Insight: 0..5, ... }
-  pick: PropTypes.string,                  // selected sub-pick (e.g., "Watchful Eye")
-  onSelectPick: PropTypes.func,            // (pick) => void
+  value: PropTypes.string,
+  onSelect: PropTypes.func.isRequired,
+  pick: PropTypes.string,
+  onSelectPick: PropTypes.func,
+  char: PropTypes.shape({
+    // only the bits we use:
+    skills: PropTypes.object.isRequired,
+    strength: PropTypes.number,
+    speed: PropTypes.number,
+    intellect: PropTypes.number,
+    willpower: PropTypes.number,
+    awareness: PropTypes.number,
+    presence: PropTypes.number,
+  }).isRequired,
 };
