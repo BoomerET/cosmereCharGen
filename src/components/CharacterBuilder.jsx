@@ -650,7 +650,6 @@ export default function CharacterBuilder() {
           onSelect={(opt) => setChar((p) => ({ ...p, keySpecialty: opt, keyPick: "" }))}
           pick={char.keyPick}
           onSelectPick={(pick) => setChar((p) => ({ ...p, keyPick: pick }))}
-          skills={char.skills}
           char={char}
         />
       )}

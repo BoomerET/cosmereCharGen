@@ -11,7 +11,7 @@ const BASE_BY_SKILL = Object.fromEntries(
   SKILL_LIST.map(({ name, base }) => [name, base])
 );
 
-export default function KeyTalentTab({ startingPath, value, onSelect, skills, pick, onSelectPick }) {
+export default function KeyTalentTab({ startingPath, value, onSelect, pick, onSelectPick, char, }) {
   const options = PATH_TALENT_CHOICES[startingPath] || [];
   const keyTalent = PATH_KEY_TALENT_MAP[startingPath] || "";
 
@@ -32,6 +32,14 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
 
   const meets = (req = {}) =>
     Object.entries(req).every(([skill, min]) => getSkillMod(skill) >= min);
+
+  useEffect(() => {
+    const eligible = new Set(
+      (pickDefs || []).filter(d => meets(d.requires)).map(d => d.name)
+    );
+    if (pick && !eligible.has(pick)) onSelectPick?.("");
+  }, [pick, pickDefs, char, onSelectPick]); // re-check when char or pickDefs change
+
 
   // If current pick no longer eligible (skills changed), clear it
   const eligibleNames = new Set(pickDefs.filter(d => meets(d.requires)).map(d => d.name));
@@ -110,7 +118,6 @@ KeyTalentTab.propTypes = {
   pick: PropTypes.string,
   onSelectPick: PropTypes.func,
   char: PropTypes.shape({
-    // only the bits we use:
     skills: PropTypes.object.isRequired,
     strength: PropTypes.number,
     speed: PropTypes.number,
