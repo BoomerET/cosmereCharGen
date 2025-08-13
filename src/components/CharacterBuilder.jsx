@@ -78,6 +78,23 @@ export default function CharacterBuilder() {
         const newPath = payload.startingPath ?? payload.path;
         if (newPath != null && newPath !== prev.startingPath) {
           next.startingPath = newPath;
+          next.strength = 0;
+          next.speed = 0;
+          next.intellect = 0;
+          next.willpower = 0;
+          next.awareness = 0;
+          next.presence = 0;
+
+          // reset skills (all to 0)
+          next.skills = SKILL_LIST.reduce((acc, { name }) => {
+            acc[name] = 0;
+            return acc;
+          }, {});
+
+          // reset culture & extra expertise
+          next.cultures  = [];
+          next.expertise = [];         
+
           changed = true;
         }
 
@@ -539,7 +556,25 @@ if (newPath != null && newPath !== prev.startingPath) {
         </button>
       </div>
 
-      <HeaderForm onChange={handleHeaderChange} />
+      {/* <HeaderForm onChange={handleHeaderChange} /> */}
+      <HeaderForm
+  key={char.startingPath} // remount on path change
+  initialValues={{
+    name: char.characterName,
+    level: char.level,
+    path: char.startingPath,
+    attributes: {
+      Strength:  char.strength,
+      Speed:     char.speed,
+      Intellect: char.intellect,
+      Willpower: char.willpower,
+      Awareness: char.awareness,
+      Presence:  char.presence,
+    },
+  }}
+  onChange={handleHeaderChange}
+/>
+
 
       <div
         className="flex gap-2 border-b mb-2"

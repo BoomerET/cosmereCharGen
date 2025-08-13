@@ -33,6 +33,18 @@ export default function HeaderForm({ initialValues, onChange }) {
     onChange?.({ ...form });
   }, [form, onChange]);
 
+  useEffect(() => {
+  setForm({
+    name: initialValues?.name ?? "",
+    level: Number.isFinite(Number(initialValues?.level))
+      ? Number(initialValues.level)
+      : 1,
+    path: initialValues?.path ?? "",
+    attributes: { ...DEFAULT_ATTRIBUTES, ...(initialValues?.attributes || {}) },
+  });
+}, [initialValues]);
+ 
+
   const updateField = (field, value) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
