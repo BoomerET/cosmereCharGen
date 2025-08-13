@@ -100,8 +100,76 @@ export const KEY_TALENT_SPECIALTY_PICKS = {
     Thief: [
       { name: "Risky Behavior", requires: { Insight: 2 } },
       { name: "Cheap Shot" },
-      // { name: "Cheap Shot", requires: { Insight: 2 } },
+    ]
+  },
+  Envoy: {
+    Diplomat: [
+      { name: "Steadfast Challenge", requires: { Discipline: 1 } },
+      { name: "Collected" },
+    ],
+    Faithful: [
+      { name: "Customary Garb" },
+      { name: "Galvanize" },
+    ],
+    Mentor: [
+      { name: "Sound Advice" },
+      { name: "Practical Demonstration", requires: { Leadership: 1 } },
+    ]
+  },
+  Hunter: {
+    Archer: [
+      { name: "Tagging Shot", requires: { Perception: 2 } },
+      { name: "Combat Training" },
+    ],
+    Assassin: [
+      { name: "Startling Blow", requires: { Stealth: 1 } },
+      { name: "Killing Edge", requires: { Perception: 2 } },
+    ],
+    Tracker: [
+      { name: "Deadly Trap", requires: { Survival: 1 } },
+      { name: "Animal Bond", requires: { Lore: 3 } },
+    ]
+  },
+  Leader: {
+    Champion: [
+      { name: "Combat Coordinaiont", requires: { Leadership: 2 } },
+      { name: "Valiant Intervention", requires: { Athletics: 1 } },
+    ],
+    Officer: [
+      { name: "Composed" },
+      { name: "Through the Fray", requires: { Persuasion: 1 } },
+    ],
+    Politico: [
+      { name: "Cutthroat Tactics", requires: { Deception: 1 } },
+      { name: "Tactical Ploy" },
+    ]
+  },
+  Scholar: {
+    Artifabrian: [
+      { name: "Effieient Engineer", requires: { Crafting: 1 } },
+      { name: "Prized Acquisition" },
+    ],
+    Strategist: [
+      { name: "Strategize", requires: { Deduction: 1 } },
+      { name: "Mind and Body" },
+    ],
+    Surgeon: [
+      { name: "Field Medicine", requires: { Medicine: 1 } },
+      { name: "Emotional Intelligence" },
+    ]
+  },
+  Warrior: {
+    Duelist: [
+      { name: "Practiced Kata" },
+      { name: "Flamestance", requires: { Intimidation: 1 } },
+    ],
+    Shardbearer: [
+      { name: "Shard Training", requires: { Lore: 3 } },
+      { name: "Stonestance" },
+    ],
+    Soldier: [
+      { name: "Cautious Advance", requires: { Discipline: 1 } },
+      { name: "Combat Training" },
     ]
   }
-  // Envoy: { ... }, Hunter: { ... } etc.
 };
