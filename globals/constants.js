@@ -146,7 +146,7 @@ export const KEY_TALENT_SPECIALTY_PICKS = {
   },
   Scholar: {
     Artifabrian: [
-      { name: "Effieient Engineer", requires: { Crafting: 1 } },
+      { name: "Efficient Engineer", requires: { Crafting: 1 } },
       { name: "Prized Acquisition" },
     ],
     Strategist: [
