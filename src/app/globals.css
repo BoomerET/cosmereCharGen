@@ -24,3 +24,30 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Make native form controls readable in light & dark */
+input[type="text"],
+input[type="number"],
+select,
+textarea,
+button {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid rgba(128, 128, 128, 0.4);
+}
+
+/* Ensure the popup list (option menu) is legible in dark mode */
+@media (prefers-color-scheme: dark) {
+  select,
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    border-color: #3f3f46; /* zinc-700-ish */
+  }
+  select option,
+  select optgroup {
+    background-color: var(--background); /* #0a0a0a from your vars */
+    color: var(--foreground);            /* #ededed from your vars */
+  }
+}
+
