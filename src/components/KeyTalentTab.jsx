@@ -20,11 +20,6 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
     KEY_TALENT_SPECIALTY_PICKS[startingPath]?.[value] || [];
 
   // If current pick no longer eligible (skills changed), clear it
-  const eligibleNames = new Set(pickDefs.filter(d => meets(d.requires)).map(d => d.name));
-  if (pick && !eligibleNames.has(pick)) {
-    onSelectPick?.("");
-  }
-
   const getSkillMod = (skillName) => {
     const base = BASE_BY_SKILL[skillName];         // e.g., Deduction -> 'intellect'
     const ranks = char?.skills?.[skillName] || 0;  // ranks from SkillsList
@@ -37,6 +32,12 @@ export default function KeyTalentTab({ startingPath, value, onSelect, skills, pi
 
   const meets = (req = {}) =>
     Object.entries(req).every(([skill, min]) => getSkillMod(skill) >= min);
+
+  // If current pick no longer eligible (skills changed), clear it
+  const eligibleNames = new Set(pickDefs.filter(d => meets(d.requires)).map(d => d.name));
+  if (pick && !eligibleNames.has(pick)) {
+    onSelectPick?.("");
+  }
 
   return (
     <div className="mb-6">
