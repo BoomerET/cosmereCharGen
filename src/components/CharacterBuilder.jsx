@@ -27,6 +27,8 @@ export default function CharacterBuilder() {
     radiancePowers: [],
     expertise: [],
     keyTalent: "",
+    keySpecialty: "",
+    keyPick: "",
   });
 
   const [tab, setTab] = useState("stats");
@@ -315,7 +317,18 @@ export default function CharacterBuilder() {
   const buildFGXML = () => {
     const name = char.characterName || "Unnamed Character";
     const path = char.startingPath || "";
-    const keySpecialty = char.keySpecialty || "";
+    //const keySpecialty = char.keySpecialty || "";
+    const keyTalent    = PATH_KEY_TALENT_MAP[char.startingPath] || "";
+    const keySpecialty = (char.keySpecialty || "").trim();
+    const keyPick      = (char.keyPick || "").trim();
+    const hasKeyTalent = Boolean(keyTalent);
+
+    // formatted text body for the talent node
+    const talentText = [
+      keySpecialty && `<p><b>Specialty:</b> ${escapeXML(keySpecialty)}</p>`,
+      keyPick && `<p><b>Selected Option:</b> ${escapeXML(keyPick)}</p>`,
+    ].filter(Boolean).join("\n") || "<p />";
+
     const level = Number(char.level) || 1;
 
     const physicalDef =
@@ -332,8 +345,8 @@ export default function CharacterBuilder() {
     const senses = sensesString(Number(char.awareness) || 0);
     const recdie = recoveryDie(Number(char.willpower) || 0);
 
-    const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
-    const hasKeyTalent = Boolean(keyTalent);
+    //const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
+    //const hasKeyTalent = Boolean(keyTalent);
 
     const carry = carryMax(Number(char.strength) || 0);
     const lift = liftMax(Number(char.strength) || 0);
@@ -389,7 +402,8 @@ export default function CharacterBuilder() {
 
     const ancestryName = char.ancestry || "Human";
     const totalsRanks = sumSkillRanks();
-    const totalTalents = hasKeyTalent ? 1 : 0;
+    //const totalTalents = hasKeyTalent ? 1 : 0;
+    const totalTalents = hasKeyTalent ? (keyPick ? 2 : 1) : 0;
     const tier = 1;
 
     const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -475,20 +489,24 @@ export default function CharacterBuilder() {
     <skilllist>${skillItems}
     </skilllist>
 
-    <talent>
-      ${hasKeyTalent
-        ? `
-      <id-00001>
-        <name type="string">${escapeXML(keyTalent)}</name>
-        <type type="string">Key</type>
-        <text type="formattedtext">
-          <p /> 
-        </text>
-      </id-00001>`
-        : ""
-      }
-    </talent>
 
+    <talent>
+  ${hasKeyTalent ? `
+    <id-00001>
+      <name type="string">${escapeXML(keyTalent)}</name>
+      <type type="string">Key</type>
+      <text type="formattedtext">
+        ${keySpecialty ? `<p><b>Specialty:</b> ${escapeXML(keySpecialty)}</p>` : "<p />"}
+      </text>
+    </id-00001>
+    ${keyPick ? `
+    <id-00002>
+      <name type="string">${escapeXML(keyPick)}</name>
+      <type type="string">Key Option</type>
+      <text type="formattedtext"><p /></text>
+    </id-00002>` : "" }
+  ` : ""}
+</talent>
     <tier type="number">${tier}</tier>
     <totalskillranks type="number">${totalsRanks}</totalskillranks>
     <totaltalents type="number">${totalTalents}</totaltalents>
