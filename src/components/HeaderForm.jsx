@@ -151,11 +151,11 @@ export default function HeaderForm({ initialValues, onChange }) {
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            "Awareness",
-            "Intellect",
-            "Speed",
             "Strength",
+            "Speed",
+            "Intellect",
             "Willpower",
+            "Awareness",
             "Presence",
           ].map(attributeInput)}
         </div>
