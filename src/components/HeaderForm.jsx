@@ -58,28 +58,27 @@ export default function HeaderForm({ initialValues, onChange }) {
     const highlight = highlightSet.has(attrName);
     return (
       <label
-  key={attrName}
-  className={`flex items-center justify-between gap-3 p-3 ${
-    highlight ? "hl-card" : "rounded-xl border border-gray-300"
-  }`}
->
-  <span className={`text-sm font-medium ${highlight ? "hl-label" : ""}`}>
-    {attrName}
-  </span>
-  <input
-    type="number"
-    inputMode="numeric"
-    min={0}
-    max={3}
-    className="w-24 rounded-md border border-gray-300 p-2 text-right bg-background text-foreground"
-    value={form.attributes[attrName]}
-    onChange={(e) => {
-      let val = Number(e.target.value);
-      if (Number.isNaN(val)) val = 0;
-      updateAttr(attrName, Math.max(0, Math.min(3, val)));
-    }}
-  />
-</label>
+        key={attrName}
+        className={`flex items-center justify-between gap-3 p-3 ${highlight ? "hl-card" : "rounded-xl border border-gray-300"
+          }`}
+      >
+        <span className={`text-sm font-medium ${highlight ? "hl-label" : ""}`}>
+          {attrName}
+        </span>
+        <input
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={3}
+          className="w-24 rounded-md border border-gray-300 p-2 text-right bg-background text-foreground"
+          value={form.attributes[attrName]}
+          onChange={(e) => {
+            let val = Number(e.target.value);
+            if (Number.isNaN(val)) val = 0;
+            updateAttr(attrName, Math.max(0, Math.min(3, val)));
+          }}
+        />
+      </label>
 
     );
   };
