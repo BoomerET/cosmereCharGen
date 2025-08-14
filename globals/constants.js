@@ -132,7 +132,7 @@ export const KEY_TALENT_SPECIALTY_PICKS = {
   },
   Leader: {
     Champion: [
-      { name: "Combat Coordinaiont", requires: { Leadership: 2 } },
+      { name: "Combat Coordination", requires: { Leadership: 2 } },
       { name: "Valiant Intervention", requires: { Athletics: 1 } },
     ],
     Officer: [
