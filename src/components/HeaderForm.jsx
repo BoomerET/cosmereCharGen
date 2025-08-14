@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { PATH_ATTRIBUTE_HIGHLIGHTS } from "../../globals/constants";
+import { PATH_ATTRIBUTE_HIGHLIGHTS, ANCESTRIES } from "../../globals/constants";
 
 /**
  * Highlights attributes based on Chosen Path.
@@ -87,7 +87,7 @@ export default function HeaderForm({ initialValues, onChange }) {
   return (
     <div className="space-y-6">
       {/* Basic Info */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <label className="flex flex-col gap-1">
           <span className="text-sm font-medium">Character Name</span>
           <input
@@ -135,6 +135,19 @@ export default function HeaderForm({ initialValues, onChange }) {
             <option value="Warrior">Warrior</option>
           </select>
         </label>
+        <label className="flex flex-col gap-1">
+  <span className="text-sm font-medium">Ancestry</span>
+  <select
+    name="ancestry"
+    className="rounded-md border border-gray-300 p-2 bg-background text-foreground"
+    value={form.ancestry}
+    onChange={(e) => updateField("ancestry", e.target.value)}
+  >
+    {ANCESTRIES.map((a) => (
+      <option key={a} value={a}>{a}</option>
+    ))}
+  </select>
+</label>
       </div>
 
       {/* Attributes */}

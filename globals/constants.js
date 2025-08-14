@@ -173,3 +173,12 @@ export const KEY_TALENT_SPECIALTY_PICKS = {
     ]
   }
 };
+
+// globals/constants.js
+export const ANCESTRIES = [
+  "Human",
+  "Listener",
+  // Add more here anytime:
+  // "Aimian (Siah)", "Aimian (Dysian)", "Horneater", "Shin", ...
+];
+
