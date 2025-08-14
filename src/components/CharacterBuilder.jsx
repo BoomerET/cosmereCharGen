@@ -318,9 +318,9 @@ export default function CharacterBuilder() {
     const name = char.characterName || "Unnamed Character";
     const path = char.startingPath || "";
     //const keySpecialty = char.keySpecialty || "";
-    const keyTalent    = PATH_KEY_TALENT_MAP[char.startingPath] || "";
+    const keyTalent = PATH_KEY_TALENT_MAP[char.startingPath] || "";
     const keySpecialty = (char.keySpecialty || "").trim();
-    const keyPick      = (char.keyPick || "").trim();
+    const keyPick = (char.keyPick || "").trim();
     const hasKeyTalent = Boolean(keyTalent);
 
     // formatted text body for the talent node
@@ -504,7 +504,7 @@ export default function CharacterBuilder() {
       <name type="string">${escapeXML(keyPick)}</name>
       <type type="string">Key Option</type>
       <text type="formattedtext"><p /></text>
-    </id-00002>` : "" }
+    </id-00002>` : ""}
   ` : ""}
 </talent>
     <tier type="number">${tier}</tier>
@@ -595,7 +595,7 @@ export default function CharacterBuilder() {
         onChange={handleHeaderChange}
       />
 
-<br />
+      <br />
       <div
         className="flex gap-2 border-b mb-2"
         role="tablist"

@@ -136,18 +136,18 @@ export default function HeaderForm({ initialValues, onChange }) {
           </select>
         </label>
         <label className="flex flex-col gap-1">
-  <span className="text-sm font-medium">Ancestry</span>
-  <select
-    name="ancestry"
-    className="rounded-md border border-gray-300 p-2 bg-background text-foreground"
-    value={form.ancestry}
-    onChange={(e) => updateField("ancestry", e.target.value)}
-  >
-    {ANCESTRIES.map((a) => (
-      <option key={a} value={a}>{a}</option>
-    ))}
-  </select>
-</label>
+          <span className="text-sm font-medium">Ancestry</span>
+          <select
+            name="ancestry"
+            className="rounded-md border border-gray-300 p-2 bg-background text-foreground"
+            value={form.ancestry}
+            onChange={(e) => updateField("ancestry", e.target.value)}
+          >
+            {ANCESTRIES.map((a) => (
+              <option key={a} value={a}>{a}</option>
+            ))}
+          </select>
+        </label>
       </div>
       {/* Attributes */}
       <section>
