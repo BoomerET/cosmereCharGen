@@ -58,29 +58,32 @@ export default function HeaderForm({ initialValues, onChange }) {
     const highlight = highlightSet.has(attrName);
     return (
       <label
-        key={attrName}
-        className={`flex items-center justify-between gap-3 rounded-xl border p-3
-        ${highlight ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50" : "border-gray-300"}
-      `}
-      >
-        <span className="text-sm font-medium">{attrName}</span>
-        <input
-          type="number"
-          inputMode="numeric"
-          min={0}
-          max={3}
-          className="w-24 rounded-md border border-gray-300 p-2 text-right"
-          value={form.attributes[attrName]}
-          onChange={(e) => {
-            let val = Number(e.target.value);
-            if (Number.isNaN(val)) {
-              val = 0; // reset immediately if not numeric
-            }
-            const clamped = Math.max(0, Math.min(3, val));
-            updateAttr(attrName, clamped);
-          }}
-        />
-      </label>
+  key={attrName}
+  className={`flex items-center justify-between gap-3 rounded-xl border p-3
+    ${highlight
+      ? "ring-2 ring-amber-400 border-amber-300 bg-amber-50 dark:bg-amber-900/25"
+      : "border-gray-300"}
+  `}
+>
+  <span className={`text-sm font-medium ${highlight ? "text-gray-900 dark:text-amber-50" : ""}`}>
+    {attrName}
+  </span>
+  <input
+    type="number"
+    inputMode="numeric"
+    min={0}
+    max={3}
+    className="w-24 rounded-md border border-gray-300 p-2 text-right bg-background text-foreground"
+    value={form.attributes[attrName]}
+    onChange={(e) => {
+      let val = Number(e.target.value);
+      if (Number.isNaN(val)) val = 0;
+      const clamped = Math.max(0, Math.min(3, val));
+      updateAttr(attrName, clamped);
+    }}
+  />
+</label>
+
     );
   };
 
