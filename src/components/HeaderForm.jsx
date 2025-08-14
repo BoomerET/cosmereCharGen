@@ -149,7 +149,6 @@ export default function HeaderForm({ initialValues, onChange }) {
   </select>
 </label>
       </div>
-
       {/* Attributes */}
       <section>
         <div className="mb-2 flex items-center justify-between">

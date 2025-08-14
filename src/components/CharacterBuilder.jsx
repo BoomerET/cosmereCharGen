@@ -595,7 +595,7 @@ export default function CharacterBuilder() {
         onChange={handleHeaderChange}
       />
 
-
+<br />
       <div
         className="flex gap-2 border-b mb-2"
         role="tablist"
