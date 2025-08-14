@@ -51,3 +51,24 @@ button {
   }
 }
 
+/* Reusable highlight treatment for light/dark */
+.hl-card {
+  border: 1px solid #fbbf24;         /* amber-300 */
+  box-shadow: 0 0 0 2px rgba(251,191,36,1);
+  background: #fff7ed;               /* amber-50 */
+  border-radius: 0.75rem;            /* ~ rounded-xl */
+}
+@media (prefers-color-scheme: dark) {
+  .hl-card {
+    background: rgba(120,53,15,0.25); /* amber-900 @ 25% */
+    box-shadow: 0 0 0 2px rgba(251,191,36,0.6);
+    border-color: rgba(251,191,36,0.6);
+  }
+}
+
+/* Label text that sits on a highlighted card */
+.hl-label { color: #111827; }        /* gray-900 */
+@media (prefers-color-scheme: dark) {
+  .hl-label { color: #fffbeb; }      /* amber-50 */
+}
+

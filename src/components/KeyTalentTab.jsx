@@ -60,19 +60,27 @@ export default function KeyTalentTab({ startingPath, value, onSelect, pick, onSe
           {/* Specialty */}
           <fieldset className="space-y-2 mb-4">
             <legend className="text-sm text-gray-600 mb-1">Choose your Specialty</legend>
-            {options.map((opt) => (
-              <label key={opt} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="key-talent-specialty"
-                  value={opt}
-                  checked={value === opt}
-                  onChange={() => onSelect(opt)}
-                  className="w-4 h-4"
-                />
-                <span>{opt}</span>
-              </label>
-            ))}
+            {options.map((opt) => {
+  const checked = value === opt;
+  return (
+    <label
+      key={opt}
+      className={`flex items-center gap-2 p-2 rounded-lg border ${
+        checked ? "hl-card" : "border-gray-300"
+      }`}
+    >
+      <input
+        type="radio"
+        name="key-talent-specialty"
+        value={opt}
+        checked={checked}
+        onChange={() => onSelect(opt)}
+        className="w-4 h-4"
+      />
+      <span className={checked ? "hl-label" : ""}>{opt}</span>
+    </label>
+  );
+})}
           </fieldset>
 
           {/* Sub-pick (gated) */}
@@ -80,22 +88,31 @@ export default function KeyTalentTab({ startingPath, value, onSelect, pick, onSe
             <fieldset className="space-y-2">
               <legend className="text-sm text-gray-600 mb-1">Choose one option</legend>
               {pickDefs.map(({ name, requires }) => {
-                const ok = meets(requires);
-                return (
-                  <label key={name} className={`flex items-center gap-2 ${ok ? "" : "opacity-60"}`} title={reqText(requires)}>
-                    <input
-                      type="radio"
-                      name="key-talent-pick"
-                      value={name}
-                      checked={pick === name}
-                      onChange={() => onSelectPick(name)}
-                      disabled={!ok}
-                      className="w-4 h-4"
-                    />
-                    <span>{name}{requires && ` (req: ${reqText(requires)})`}</span>
-                  </label>
-                );
-              })}
+  const ok = meets(requires);
+  const checked = pick === name;
+  return (
+    <label
+      key={name}
+      title={reqText(requires)}
+      className={`flex items-center gap-2 p-2 rounded-lg border ${
+        checked ? "hl-card" : "border-gray-300"
+      } ${ok ? "" : "opacity-60"}`}
+    >
+      <input
+        type="radio"
+        name="key-talent-pick"
+        value={name}
+        checked={checked}
+        onChange={() => onSelectPick(name)}
+        disabled={!ok}
+        className="w-4 h-4"
+      />
+      <span className={checked ? "hl-label" : ""}>
+        {name}{requires && ` (req: ${reqText(requires)})`}
+      </span>
+    </label>
+  );
+})}
               {pickDefs.every(({ requires }) => !meets(requires)) && (
                 <p className="text-xs text-amber-700 mt-1">
                   No eligible options yet. Raise {reqText(

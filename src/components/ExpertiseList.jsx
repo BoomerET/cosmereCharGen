@@ -49,16 +49,22 @@ export default function ExpertiseList({ char, onToggleCulture, onToggleExtra }) 
           };
 
           return (
-            <label key={opt} className={`flex items-center space-x-2 ${isDisabled ? 'opacity-60' : ''}`}>
-              <input
-                type="checkbox"
-                checked={isSelected}
-                disabled={isDisabled}
-                onChange={onChange}
-                className="w-4 h-4 border rounded"
-              />
-              <span>{opt}</span>
-            </label>
+            <label
+  key={opt}
+  className={`flex items-center space-x-2 p-2 rounded-lg border ${
+    isSelected ? "hl-card" : "border-gray-300"
+  } ${isDisabled ? "opacity-60" : ""}`}
+>
+  <input
+    type="checkbox"
+    checked={isSelected}
+    disabled={isDisabled}
+    onChange={onChange}
+    className="w-4 h-4 border rounded"
+  />
+  <span className={isSelected ? "hl-label" : ""}>{opt}</span>
+</label>
+
           );
         })}
       </div>
