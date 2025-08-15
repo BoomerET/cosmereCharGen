@@ -312,7 +312,7 @@ export default function CharacterBuilder() {
       0
     );
 
-  const normalizeCulture = (c) => (c === "Listeners" ? "Listener" : c);
+  const normalizeCulture = (c) => (c === "Singers" ? "Singer" : c);
 
   const buildFGXML = () => {
     const name = char.characterName || "Unnamed Character";
@@ -325,7 +325,7 @@ export default function CharacterBuilder() {
 
     // formatted text body for the talent node
     const talentText = [
-      keySpecialty && `<p><b>Specialty:</b> ${escapeXML(keySpecialty)}</p>`,
+      keySpecialty && `<p><b>Specialty:</b> ${escapeXML(keySpecialty)} (Key)</p>`,
       keyPick && `<p><b>Selected Option:</b> ${escapeXML(keyPick)}</p>`,
     ].filter(Boolean).join("\n") || "<p />";
 
@@ -494,10 +494,7 @@ export default function CharacterBuilder() {
   ${hasKeyTalent ? `
     <id-00001>
       <name type="string">${escapeXML(keyTalent)}</name>
-      <type type="string">Key</type>
-      <text type="formattedtext">
-        ${keySpecialty ? `<p><b>Specialty:</b> ${escapeXML(keySpecialty)}</p>` : "<p />"}
-      </text>
+      <specialty type="string">${escapeXML(keySpecialty)}</specialty>
     </id-00001>
     ${keyPick ? `
     <id-00002>
