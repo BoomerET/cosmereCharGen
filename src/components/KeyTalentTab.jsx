@@ -57,31 +57,33 @@ export default function KeyTalentTab({ startingPath, value, onSelect, pick, onSe
         <p className="text-sm text-gray-600">No Key Talent options defined for this path.</p>
       ) : (
         <>
-          {/* Specialty */}
-          <fieldset className="space-y-2 mb-4">
-            <legend className="text-sm text-gray-600 mb-1">Choose your Specialty</legend>
-            {options.map((opt) => {
-              const checked = value === opt;
-              return (
-                <label
-                  key={opt}
-                  className={`flex items-center gap-2 p-2 rounded-lg border ${checked ? "hl-card" : "border-gray-300"
-                    }`}
-                >
-                  <input
-                    type="radio"
-                    name="key-talent-specialty"
-                    value={opt}
-                    checked={checked}
-                    onChange={() => onSelect(opt)}
-                    className="w-4 h-4"
-                  />
-                  <span className={checked ? "hl-label" : ""}>{opt}</span>
-                </label>
-              );
-            })}
-          </fieldset>
-
+{/* Specialty */}
+<fieldset className="flex flex-wrap gap-2 mb-4">
+  <legend className="basis-full text-sm text-gray-600 mb-1">
+    Choose your Specialty
+  </legend>
+  {options.map((opt) => {
+    const checked = value === opt;
+    return (
+      <label
+        key={opt}
+        className={`flex items-center gap-2 p-2 rounded-lg border ${
+          checked ? "hl-card" : "border-gray-300"
+        }`}
+      >
+        <input
+          type="radio"
+          name="key-talent-specialty"
+          value={opt}
+          checked={checked}
+          onChange={() => onSelect(opt)}
+          className="w-4 h-4"
+        />
+        <span className={checked ? "hl-label" : ""}>{opt}</span>
+      </label>
+    );
+  })}
+</fieldset>
           {/* Sub-pick (gated) */}
           {pickDefs.length > 0 && (
             <fieldset className="space-y-2">
